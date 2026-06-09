@@ -1,11 +1,4 @@
-const getBaseUrl = () => {
-  if (typeof window !== 'undefined') {
-    return `http://${window.location.hostname}:3001`;
-  }
-  return 'http://localhost:3001';
-};
-
-const BASE_URL = getBaseUrl();
+const BASE_URL = '';
 
 export async function apiRequest(endpoint: string, options: RequestInit = {}) {
   const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
