@@ -1,4 +1,4 @@
--- CampusOne Cashless System - Unified Database Schema
+-- CampusOne Cashless System - Parent Portal Database Schema
 
 -- 1. Parents Table
 CREATE TABLE Parents (
@@ -11,10 +11,9 @@ CREATE TABLE Parents (
 -- 2. Students Table
 CREATE TABLE Students (
     id SERIAL PRIMARY KEY,
-    parent_id INT REFERENCES Parents(id) ON DELETE CASCADE, -- Nullable so Admin can register card first
+    parent_id INT NOT NULL REFERENCES Parents(id) ON DELETE CASCADE,
     name VARCHAR(255) NOT NULL,
-    uid VARCHAR(50) UNIQUE, -- NFC Card Hardware UID
-    campus_pin VARCHAR(4) CHECK (campus_pin ~ '^[0-9]{4}$'), -- Enforce 4-digit PIN
+    campus_pin VARCHAR(4) NOT NULL CHECK (campus_pin ~ '^[0-9]{4}$'), -- Enforce 4-digit PIN
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
@@ -26,16 +25,5 @@ CREATE TABLE Wallet (
     CONSTRAINT chk_positive_balance CHECK (balance >= 0.00)
 );
 
--- 4. Transactions Table
-CREATE TABLE Transactions (
-    id SERIAL PRIMARY KEY,
-    student_id INT REFERENCES Students(id) ON DELETE CASCADE,
-    item VARCHAR(255) NOT NULL,
-    amount DECIMAL(10, 2) NOT NULL,
-    date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    CONSTRAINT chk_positive_amount CHECK (amount >= 0.00)
-);
-
--- Index for faster student lookups
+-- Index for faster student lookup by parent
 CREATE INDEX idx_students_parent ON Students(parent_id);
-CREATE INDEX idx_students_uid ON Students(uid);
