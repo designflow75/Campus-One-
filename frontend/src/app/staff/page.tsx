@@ -33,6 +33,137 @@ export default function StaffDashboard() {
   const [nfcAssignError, setNfcAssignError] = useState('');
   const [nfcAssignSuccess, setNfcAssignSuccess] = useState('');
 
+  // Physical Web NFC states
+  const [nfcSupported, setNfcSupported] = useState(false);
+  const [nfcScanningActive, setNfcScanningActive] = useState(false);
+  const [nfcPermissionState, setNfcPermissionState] = useState<'prompt' | 'granted' | 'denied' | 'unsupported'>('prompt');
+  const [nfcErrorText, setNfcErrorText] = useState('');
+
+  // Web NFC NDEFReader API integration
+  useEffect(() => {
+    if (typeof window !== 'undefined' && 'NDEFReader' in window) {
+      setNfcSupported(true);
+      startPhysicalNfcScan();
+    }
+  }, [activeTab]);
+
+  const startPhysicalNfcScan = async () => {
+    if (typeof window === 'undefined' || !('NDEFReader' in window)) {
+      setNfcPermissionState('unsupported');
+      return;
+    }
+
+    try {
+      const NDEFReaderClass = (window as any).NDEFReader;
+      const ndef = new NDEFReaderClass();
+      await ndef.scan();
+      setNfcScanningActive(true);
+      setNfcPermissionState('granted');
+      setNfcErrorText('');
+
+      ndef.addEventListener("readingerror", () => {
+        setNfcErrorText("NFC read error. Try tapping the card again.");
+      });
+
+      ndef.addEventListener("reading", ({ serialNumber }: any) => {
+        const cleanUid = serialNumber.replace(/:/g, '').toUpperCase();
+        console.log("Web NFC scanned hardware UID:", cleanUid);
+
+        if (activeTab === 'CHECKOUT') {
+          setNfcUid(cleanUid);
+          setCart((currentCart) => {
+            const cartLines = Object.values(currentCart);
+            if (cartLines.length > 0) {
+              autoCheckout(cleanUid, currentCart);
+            }
+            return currentCart;
+          });
+        } else if (activeTab === 'NFC_REGISTRY') {
+          setNewNfcUid(cleanUid);
+          setSelectedStudentForNfc((currentStudentId) => {
+            if (currentStudentId) {
+              autoLinkNfc(currentStudentId, cleanUid);
+            }
+            return currentStudentId;
+          });
+        }
+      });
+    } catch (err: any) {
+      console.error("Web NFC Error:", err);
+      if (err.name === 'NotAllowedError') {
+        setNfcPermissionState('denied');
+      } else {
+        setNfcErrorText(err.message || "Could not activate NFC reader.");
+      }
+      setNfcScanningActive(false);
+    }
+  };
+
+  const autoCheckout = async (cardUid: string, currentCart: any) => {
+    const cartLines = Object.values(currentCart);
+    if (cartLines.length === 0) return;
+
+    setProcessingTransaction(true);
+    try {
+      const payload = {
+        nfcUid: cardUid,
+        items: cartLines.map((line: any) => ({
+          itemId: line.item.id,
+          quantity: line.quantity,
+        })),
+      };
+
+      const result = await apiRequest('/transactions/scan', {
+        method: 'POST',
+        body: JSON.stringify(payload),
+      });
+
+      setTransactionResult(result);
+      setShowResultOverlay(true);
+
+      if (result.success) {
+        clearCart();
+      }
+
+      // Refresh daily metrics
+      const statsData = await apiRequest('/analytics/staff');
+      setStats(statsData);
+    } catch (err: any) {
+      setTransactionResult({
+        success: false,
+        message: 'Transaction failed',
+        reason: err.message || 'Unknown network error',
+      });
+      setShowResultOverlay(true);
+    } finally {
+      setProcessingTransaction(false);
+    }
+  };
+
+  const autoLinkNfc = async (studentId: string, cardUid: string) => {
+    setNfcAssignError('');
+    setNfcAssignSuccess('');
+    setAssigningNfc(true);
+    try {
+      await apiRequest(`/students/${studentId}/nfc`, {
+        method: 'PATCH',
+        body: JSON.stringify({ nfcUid: cardUid }),
+      });
+
+      setNfcAssignSuccess(`Card UID ${cardUid} linked successfully!`);
+      setNewNfcUid('');
+      setSelectedStudentForNfc('');
+      
+      // Refresh students list
+      const studentsData = await apiRequest('/students');
+      setStudents(studentsData);
+    } catch (err: any) {
+      setNfcAssignError(err.message || 'Failed to assign NFC Card.');
+    } finally {
+      setAssigningNfc(false);
+    }
+  };
+
   // 1. Auth check and initial load
   useEffect(() => {
     const userStr = localStorage.getItem('user');
@@ -289,6 +420,57 @@ export default function StaffDashboard() {
       {/* Main Layout */}
       <div className="max-w-7xl mx-auto px-6 mt-8">
         
+        {/* Physical NFC Reader Status Alert */}
+        {nfcSupported ? (
+          <div className="mb-6 p-4 rounded-2xl bg-slate-900/40 border border-slate-900 flex items-center justify-between flex-wrap gap-4">
+            <div className="flex items-center gap-3">
+              <span className="relative flex h-3 w-3">
+                <span className={`animate-ping absolute inline-flex h-full w-full rounded-full opacity-75 ${
+                  nfcScanningActive ? 'bg-emerald-400' : 'bg-amber-400'
+                }`}></span>
+                <span className={`relative inline-flex rounded-full h-3 w-3 ${
+                  nfcScanningActive ? 'bg-emerald-500' : 'bg-amber-500'
+                }`}></span>
+              </span>
+              <div>
+                <p className="text-xs font-bold text-slate-200">
+                  {nfcScanningActive ? 'Physical NFC Reader Active' : 'Physical NFC Reader Stopped'}
+                </p>
+                <p className="text-[10px] text-slate-500 mt-0.5">
+                  {nfcScanningActive 
+                    ? 'Hardware scanner is listening. Tap any physical card against your phone to trigger actions.' 
+                    : 'Hardware scanner is inactive. Tap "Activate Scanner" to start listening.'}
+                </p>
+              </div>
+            </div>
+            {!nfcScanningActive && (
+              <button
+                type="button"
+                onClick={startPhysicalNfcScan}
+                className="px-4 py-1.5 rounded-xl bg-indigo-600/20 hover:bg-indigo-600/35 border border-indigo-500/30 text-indigo-300 text-[11px] font-bold cursor-pointer transition"
+              >
+                Activate Scanner
+              </button>
+            )}
+          </div>
+        ) : (
+          <div className="mb-6 p-4 rounded-2xl bg-slate-900/20 border border-slate-900/50 flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <span className="w-2.5 h-2.5 rounded-full bg-slate-700" />
+              <div>
+                <p className="text-xs font-bold text-slate-400">NFC Simulator Active</p>
+                <p className="text-[10px] text-slate-500 mt-0.5">Hardware NFC reading is unavailable on this browser/device. Use the manual controls below to test.</p>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {nfcErrorText && (
+          <div className="mb-6 p-3.5 rounded-xl bg-rose-500/10 border border-rose-500/20 text-rose-300 text-xs font-semibold">
+            {nfcErrorText}
+          </div>
+        )}
+
         {/* Statistics Grid */}
         {stats && (
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
