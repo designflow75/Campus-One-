@@ -1,0 +1,27 @@
+# Dependency directories
+**/node_modules/
+node_modules/
+
+# Next.js build output
+**/.next/
+.next/
+
+# NestJS build output
+**/dist/
+dist/
+
+# SQLite database files
+**/dev.db
+**/dev.db-journal
+dev.db
+dev.db-journal
+
+# Environment credentials
+**/.env
+.env
+**/firebase-service-account.json
+firebase-service-account.json
+
+# System files
+.DS_Store
+Thumbs.db

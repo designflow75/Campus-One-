@@ -1,0 +1,99 @@
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model User {
+  id        String    @id @default(uuid())
+  name      String
+  email     String    @unique
+  password  String
+  role      String    // "PARENT", "STAFF", "ADMIN"
+  fcmToken  String?
+  students  Student[] @relation("ParentStudents")
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+}
+
+model Student {
+  id           String        @id @default(uuid())
+  name         String
+  class        String
+  nfcUid       String?       @unique
+  parentId     String
+  parent       User          @relation("ParentStudents", fields: [parentId], references: [id])
+  wallet       Wallet?
+  transactions Transaction[]
+  restrictions Restriction[]
+  allergies    Allergy[]
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+}
+
+model Wallet {
+  id                   String   @id @default(uuid())
+  studentId            String   @unique
+  student              Student  @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  balance              Float    @default(0.0)
+  dailyLimit           Float?
+  weeklyLimit          Float?
+  monthlyLimit         Float?
+  perTransactionLimit Float?
+  updatedAt            DateTime @updatedAt
+}
+
+model MenuItem {
+  id              String            @id @default(uuid())
+  name            String
+  category        String
+  price           Float
+  calories        Float             @default(0)
+  protein         Float             @default(0)
+  carbs           Float             @default(0)
+  fat             Float             @default(0)
+  allergenTags    String            // Stored as comma-separated values, e.g. "peanut,dairy"
+  restrictionTags String            // Stored as comma-separated values, e.g. "junk,soda"
+  isAvailable     Boolean           @default(true)
+  createdAt       DateTime          @default(now())
+  transactionItems TransactionItem[]
+}
+
+model Transaction {
+  id            String            @id @default(uuid())
+  studentId     String
+  student       Student           @relation(fields: [studentId], references: [id])
+  amount        Float
+  status        String            // "SUCCESS", "FAILED", "DECLINED"
+  failureReason String?
+  timestamp     DateTime          @default(now())
+  items         TransactionItem[]
+}
+
+model TransactionItem {
+  id            String      @id @default(uuid())
+  transactionId String
+  transaction   Transaction @relation(fields: [transactionId], references: [id], onDelete: Cascade)
+  menuItemId    String
+  menuItem      MenuItem    @relation(fields: [menuItemId], references: [id])
+  quantity      Int
+  price         Float
+}
+
+model Restriction {
+  id        String   @id @default(uuid())
+  studentId String
+  student   Student  @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  type      String   // "JUNK_FOOD_BLOCK", "SOFT_DRINK_BLOCK", "CATEGORY_RESTRICTION", "CUSTOM_ITEM_RESTRICTION"
+  value     String?  // Category name or custom item ID
+}
+
+model Allergy {
+  id          String   @id @default(uuid())
+  studentId   String
+  student     Student  @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  allergyName String   // "PEANUT", "DAIRY", "EGG", etc.
+}
