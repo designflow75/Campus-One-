@@ -5,7 +5,8 @@ import { useRouter } from 'next/navigation';
 import { apiRequest } from '@/utils/api';
 import { 
   ShoppingBag, Trash2, ShieldAlert, CreditCard, LogOut, 
-  RefreshCw, CheckCircle, XCircle, Info, History, DollarSign
+  RefreshCw, CheckCircle, XCircle, Info, History, DollarSign,
+  Wifi, Cpu, Smartphone, Plus, Minus, UserCheck, UserPlus, AlertCircle, Sparkles
 } from 'lucide-react';
 
 export default function StaffDashboard() {
@@ -590,21 +591,33 @@ export default function StaffDashboard() {
         {/* Statistics Grid */}
         {stats && (
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-            <div className="p-4 bg-slate-900/40 rounded-xl border border-slate-900">
-              <span className="text-[10px] text-slate-500 font-bold uppercase">TODAY'S ORDERS</span>
-              <p className="text-xl font-extrabold font-heading text-slate-200 mt-1">{stats.todayTransactions}</p>
+            <div className="glass-panel p-4.5 rounded-2xl border border-slate-900/50 flex flex-col justify-between hover:border-slate-800 transition duration-300">
+              <div className="flex justify-between items-start">
+                <span className="text-[10px] text-slate-500 font-extrabold uppercase tracking-wider">Today's Orders</span>
+                <ShoppingBag className="w-4 h-4 text-indigo-400" />
+              </div>
+              <p className="text-2xl font-black font-heading text-slate-200 mt-3">{stats.todayTransactions}</p>
             </div>
-            <div className="p-4 bg-slate-900/40 rounded-xl border border-slate-900">
-              <span className="text-[10px] text-slate-500 font-bold uppercase">REVENUE</span>
-              <p className="text-xl font-extrabold font-heading text-emerald-400 mt-1">₹{stats.revenueSummary.toFixed(2)}</p>
+            <div className="glass-panel p-4.5 rounded-2xl border border-slate-900/50 flex flex-col justify-between hover:border-slate-800 transition duration-300">
+              <div className="flex justify-between items-start">
+                <span className="text-[10px] text-slate-500 font-extrabold uppercase tracking-wider">Revenue Summary</span>
+                <DollarSign className="w-4 h-4 text-emerald-450" />
+              </div>
+              <p className="text-2xl font-black font-heading text-emerald-400 mt-3">₹{stats.revenueSummary.toFixed(2)}</p>
             </div>
-            <div className="p-4 bg-slate-900/40 rounded-xl border border-slate-900">
-              <span className="text-[10px] text-slate-500 font-bold uppercase">FAILED SCANS</span>
-              <p className="text-xl font-extrabold font-heading text-rose-500 mt-1">{stats.failedTransactions}</p>
+            <div className="glass-panel p-4.5 rounded-2xl border border-slate-900/50 flex flex-col justify-between hover:border-slate-800 transition duration-300">
+              <div className="flex justify-between items-start">
+                <span className="text-[10px] text-slate-500 font-extrabold uppercase tracking-wider">Failed Scans</span>
+                <ShieldAlert className="w-4 h-4 text-rose-400 animate-pulse" />
+              </div>
+              <p className="text-2xl font-black font-heading text-rose-500 mt-3">{stats.failedTransactions}</p>
             </div>
-            <div className="p-4 bg-slate-900/40 rounded-xl border border-slate-900">
-              <span className="text-[10px] text-slate-500 font-bold uppercase">ACTIVE STUDENTS</span>
-              <p className="text-xl font-extrabold font-heading text-indigo-400 mt-1">{stats.activeStudents}</p>
+            <div className="glass-panel p-4.5 rounded-2xl border border-slate-900/50 flex flex-col justify-between hover:border-slate-800 transition duration-300">
+              <div className="flex justify-between items-start">
+                <span className="text-[10px] text-slate-500 font-extrabold uppercase tracking-wider">Active Students</span>
+                <UserCheck className="w-4 h-4 text-indigo-400" />
+              </div>
+              <p className="text-2xl font-black font-heading text-indigo-400 mt-3">{stats.activeStudents}</p>
             </div>
           </div>
         )}
@@ -649,21 +662,24 @@ export default function StaffDashboard() {
                   <button
                     key={item.id}
                     onClick={() => addToCart(item)}
-                    className="glass-panel p-4 rounded-2xl border border-slate-900/60 text-left hover:border-indigo-500/40 cursor-pointer flex flex-col justify-between group transition relative overflow-hidden"
+                    className="glass-panel p-4 rounded-2xl border border-slate-900/60 text-left hover:border-indigo-500/50 hover:-translate-y-1 hover:shadow-lg hover:shadow-indigo-500/5 cursor-pointer flex flex-col justify-between group transition-all duration-300 relative overflow-hidden min-h-[175px]"
                   >
-                    <div className="absolute top-0 right-0 w-12 h-12 bg-indigo-500/5 rounded-full blur-xl group-hover:bg-indigo-500/10 transition" />
+                    <div className="absolute top-0 right-0 w-16 h-16 bg-indigo-500/5 rounded-full blur-xl group-hover:bg-indigo-500/10 transition-all duration-300" />
                     
                     <div>
-                      <span className="text-[9px] font-bold text-slate-500 tracking-wider uppercase block">{item.category}</span>
-                      <h3 className="text-sm font-bold text-slate-200 mt-1.5 group-hover:text-white transition line-clamp-1">{item.name}</h3>
-                      <div className="flex gap-1.5 mt-2 flex-wrap">
+                      <div className="flex items-center justify-between">
+                        <span className="text-[9px] font-bold text-slate-500 tracking-wider uppercase block">{item.category}</span>
+                        <Sparkles className="w-3.5 h-3.5 text-indigo-400 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                      </div>
+                      <h3 className="text-sm font-bold text-slate-200 mt-2 group-hover:text-white transition line-clamp-1">{item.name}</h3>
+                      <div className="flex gap-1.5 mt-2.5 flex-wrap">
                         {item.allergenTags && item.allergenTags.split(',').map((tag: string) => (
-                          <span key={tag} className="text-[9px] font-bold px-1.5 py-0.5 rounded bg-rose-500/10 text-rose-300 uppercase">
+                          <span key={tag} className="text-[9px] font-bold px-1.5 py-0.5 rounded-md bg-rose-500/10 border border-rose-500/10 text-rose-300 uppercase">
                             {tag.trim()}
                           </span>
                         ))}
                         {item.restrictionTags && item.restrictionTags.split(',').map((tag: string) => (
-                          <span key={tag} className="text-[9px] font-bold px-1.5 py-0.5 rounded bg-amber-500/10 text-amber-300 uppercase">
+                          <span key={tag} className="text-[9px] font-bold px-1.5 py-0.5 rounded-md bg-amber-500/10 border border-amber-500/10 text-amber-300 uppercase">
                             {tag.trim()}
                           </span>
                         ))}
@@ -672,7 +688,7 @@ export default function StaffDashboard() {
 
                     <div className="flex justify-between items-center mt-5 border-t border-slate-900/60 pt-3">
                       <span className="text-xs text-slate-500 font-semibold">{item.calories} kcal</span>
-                      <span className="text-sm font-extrabold text-indigo-400">₹{item.price.toFixed(2)}</span>
+                      <span className="text-sm font-extrabold text-indigo-400 font-heading">₹{item.price.toFixed(2)}</span>
                     </div>
                   </button>
                 ))}
@@ -747,42 +763,42 @@ export default function StaffDashboard() {
                 </div>
 
                 {/* Directory */}
-                <div className="glass-panel p-6 rounded-2xl border border-slate-900">
+                <div className="glass-panel p-6 rounded-2xl border border-slate-900/60 shadow-lg">
                   <h3 className="text-base font-bold font-heading text-slate-200 mb-4">Student Cards Directory</h3>
                   
                   <div className="overflow-x-auto max-h-[300px] overflow-y-auto pr-1">
                     <table className="w-full text-left text-xs border-collapse">
                       <thead>
-                        <tr className="border-b border-slate-900 text-slate-500 uppercase tracking-wider font-bold">
-                          <th className="py-3 px-4">Student Name</th>
-                          <th className="py-3 px-4">Class</th>
-                          <th className="py-3 px-4">Parent Email</th>
-                          <th className="py-3 px-4">Card UID</th>
-                          <th className="py-3 px-4">Wallet Balance</th>
+                        <tr className="border-b border-slate-900 bg-slate-900/30 text-slate-400 uppercase tracking-wider font-bold text-[10px]">
+                          <th className="py-3.5 px-4 rounded-l-lg">Student Name</th>
+                          <th className="py-3.5 px-4">Class</th>
+                          <th className="py-3.5 px-4">Parent Email</th>
+                          <th className="py-3.5 px-4">Card UID</th>
+                          <th className="py-3.5 px-4 rounded-r-lg">Wallet Balance</th>
                         </tr>
                       </thead>
-                      <tbody>
+                      <tbody className="divide-y divide-slate-900/40">
                         {students.length > 0 ? (
                           students.map((s: any) => (
-                            <tr key={s.id} className="border-b border-slate-900/60 hover:bg-slate-900/10 transition">
-                              <td className="py-3.5 px-4 font-bold text-slate-200">{s.name}</td>
-                              <td className="py-3.5 px-4 text-slate-400">{s.class}</td>
-                              <td className="py-3.5 px-4 text-slate-450">{s.parent?.email || 'N/A'}</td>
-                              <td className="py-3.5 px-4">
+                            <tr key={s.id} className="hover:bg-slate-900/20 transition-all duration-200">
+                              <td className="py-4 px-4 font-bold text-slate-200">{s.name}</td>
+                              <td className="py-4 px-4 text-slate-400 font-semibold">{s.class}</td>
+                              <td className="py-4 px-4 text-slate-500 font-medium">{s.parent?.email || 'N/A'}</td>
+                              <td className="py-4 px-4">
                                 {s.nfcUid ? (
-                                  <span className="px-2 py-1 rounded-lg bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 font-bold tracking-wider">
+                                  <span className="px-2 py-1 rounded-lg bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 font-bold tracking-wider text-[10px]">
                                     {s.nfcUid}
                                   </span>
                                 ) : (
-                                  <span className="text-slate-500 italic">No Card assigned</span>
+                                  <span className="text-slate-505 italic font-semibold text-slate-500">No Card assigned</span>
                                 )}
                               </td>
-                              <td className="py-3.5 px-4 font-bold text-slate-300">₹{s.wallet?.balance?.toFixed(2) || '0.00'}</td>
+                              <td className="py-4 px-4 font-extrabold text-slate-300">₹{s.wallet?.balance?.toFixed(2) || '0.00'}</td>
                             </tr>
                           ))
                         ) : (
                           <tr>
-                            <td colSpan={5} className="py-8 text-center text-slate-500 font-medium">No students registered in the system.</td>
+                            <td colSpan={5} className="py-12 text-center text-slate-500 font-semibold">No students registered in the system.</td>
                           </tr>
                         )}
                       </tbody>
@@ -796,242 +812,314 @@ export default function StaffDashboard() {
           {/* COLUMN 3: CART & NFC SCANNER */}
           <div className="space-y-6">
             
-            {/* Cart Box */}
-            <div className="glass-panel p-6 rounded-2xl border border-slate-900 flex flex-col justify-between min-h-[400px]">
+            {/* Card 1: Order Summary */}
+            <div className="glass-panel p-6 rounded-2xl border border-slate-900/60 flex flex-col justify-between min-h-[320px] transition-all duration-300 hover:border-slate-800">
               <div>
-                <div className="flex justify-between items-center mb-5 border-b border-slate-900 pb-3">
-                  <h3 className="font-bold font-heading text-base text-slate-200">Current Cart</h3>
+                <div className="flex justify-between items-center mb-5 border-b border-slate-900/80 pb-3">
+                  <div className="flex items-center gap-2">
+                    <ShoppingBag className="w-4.5 h-4.5 text-indigo-400" />
+                    <h3 className="font-bold font-heading text-sm text-slate-200">Current Order</h3>
+                  </div>
                   {Object.keys(cart).length > 0 && (
                     <button
                       onClick={clearCart}
-                      className="text-xs text-slate-500 hover:text-rose-400 font-semibold flex items-center gap-1 cursor-pointer transition"
+                      className="text-xs text-slate-500 hover:text-rose-450 font-semibold flex items-center gap-1 cursor-pointer transition"
                     >
                       <Trash2 className="w-3.5 h-3.5" />
-                      Clear
+                      Clear Order
                     </button>
                   )}
                 </div>
 
                 {/* Cart Items list */}
-                <div className="space-y-3.5 max-h-[260px] overflow-y-auto pr-1">
+                <div className="space-y-3 max-h-[220px] overflow-y-auto pr-1">
                   {Object.values(cart).length > 0 ? (
                     Object.values(cart).map((line) => (
-                      <div key={line.item.id} className="flex justify-between items-center p-3 rounded-xl bg-slate-900/30 border border-slate-950/40">
+                      <div key={line.item.id} className="flex justify-between items-center p-3 rounded-xl bg-slate-900/20 border border-slate-900/50 hover:bg-slate-900/40 hover:border-slate-800/60 transition-all duration-200">
                         <div className="flex-1 min-w-0 pr-3">
-                          <h4 className="text-sm font-bold text-slate-300 line-clamp-1">{line.item.name}</h4>
+                          <h4 className="text-xs font-bold text-slate-200 line-clamp-1">{line.item.name}</h4>
                           <span className="text-[10px] text-slate-500 font-bold">₹{line.item.price.toFixed(2)} each</span>
                         </div>
                         
-                        <div className="flex items-center gap-2">
+                        <div className="flex items-center gap-1.5">
                           <button
                             onClick={() => updateQuantity(line.item.id, line.quantity - 1)}
-                            className="w-6 h-6 rounded-lg bg-slate-900 hover:bg-slate-800 text-slate-300 font-bold flex items-center justify-center cursor-pointer transition border border-slate-850"
+                            className="w-6 h-6 rounded-lg bg-slate-950 hover:bg-slate-900 text-slate-400 hover:text-slate-200 font-bold flex items-center justify-center cursor-pointer transition border border-slate-900"
                           >
-                            -
+                            <Minus className="w-3.5 h-3.5" />
                           </button>
-                          <span className="text-sm font-bold w-6 text-center text-slate-200">{line.quantity}</span>
+                          <span className="text-xs font-bold w-6 text-center text-slate-200">{line.quantity}</span>
                           <button
                             onClick={() => updateQuantity(line.item.id, line.quantity + 1)}
-                            className="w-6 h-6 rounded-lg bg-slate-900 hover:bg-slate-800 text-slate-300 font-bold flex items-center justify-center cursor-pointer transition border border-slate-850"
+                            className="w-6 h-6 rounded-lg bg-slate-950 hover:bg-slate-900 text-slate-400 hover:text-slate-200 font-bold flex items-center justify-center cursor-pointer transition border border-slate-900"
                           >
-                            +
+                            <Plus className="w-3.5 h-3.5" />
                           </button>
                         </div>
                       </div>
                     ))
                   ) : (
-                    <p className="text-sm text-slate-500 text-center py-12">Cart is empty. Click items to checkout.</p>
+                    <div className="flex flex-col items-center justify-center py-10 text-center space-y-2">
+                      <ShoppingBag className="w-8 h-8 text-slate-700 animate-pulse" />
+                      <p className="text-xs text-slate-500">Awaiting items for checkout. Click on the menu items on the left to add.</p>
+                    </div>
                   )}
                 </div>
               </div>
 
-              {/* NFC Card scan block */}
               {Object.keys(cart).length > 0 && (
-                <div className="mt-8 border-t border-slate-900/60 pt-5 text-center">
-                  <div className="flex justify-between items-center mb-4 text-left">
-                    <span className="text-sm text-slate-400 font-semibold">Total Price:</span>
-                    <span className="text-xl font-extrabold text-indigo-400">₹{getCartTotal().toFixed(2)}</span>
-                  </div>
+                <div className="mt-6 pt-4 border-t border-slate-900/60 flex justify-between items-center">
+                  <span className="text-xs text-slate-400 font-bold uppercase tracking-wider">Subtotal Price</span>
+                  <span className="text-lg font-extrabold text-indigo-400 font-heading">₹{getCartTotal().toFixed(2)}</span>
+                </div>
+              )}
+            </div>
 
-                  {/* NFC Reader / USB Connectivity status indicator */}
-                  <div className="mb-4 p-3 bg-slate-950 border border-slate-900 rounded-xl flex items-center justify-between text-left">
-                    <div className="flex items-center gap-2">
-                      <svg viewBox="0 0 24 24" className="w-4 h-4 text-emerald-400" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                        <rect x="2" y="2" width="20" height="8" rx="2" ry="2" />
-                        <rect x="2" y="14" width="20" height="8" rx="2" ry="2" />
-                        <line x1="6" y1="6" x2="6.01" y2="6" />
-                        <line x1="6" y1="18" x2="6.01" y2="18" />
-                      </svg>
-                      <div>
-                        <span className="text-[9px] font-bold text-slate-500 uppercase tracking-wide">NFC Device Status</span>
-                        <p className="text-[10px] font-bold text-slate-300 mt-0.5">USB Port / Reader Ready</p>
-                      </div>
-                    </div>
-                    <span className="flex h-2 w-2 relative">
-                      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-                      <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+            {/* Card 2: NFC Payment Terminal */}
+            <div className="glass-panel p-6 rounded-2xl border border-slate-900/60 flex flex-col justify-between min-h-[350px] transition-all duration-300 hover:border-slate-800 relative overflow-hidden">
+              {/* LED/LCD Screen Display */}
+              <div>
+                <div className="flex items-center justify-between mb-4">
+                  <h3 className="font-bold font-heading text-xs text-slate-400 uppercase tracking-wider flex items-center gap-1.5">
+                    <Cpu className="w-4 h-4 text-emerald-400" />
+                    Payment Terminal
+                  </h3>
+                  {/* Status Indicator Badge */}
+                  <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-slate-950 border border-slate-900">
+                    <span className="flex h-1.5 w-1.5 relative">
+                      <span className={`animate-ping absolute inline-flex h-full w-full rounded-full opacity-75 ${
+                        (nfcScanningActive || nfcSupported) ? 'bg-emerald-400' : 'bg-amber-400'
+                      }`}></span>
+                      <span className={`relative inline-flex rounded-full h-1.5 w-1.5 ${
+                        (nfcScanningActive || nfcSupported) ? 'bg-emerald-500' : 'bg-amber-500'
+                      }`}></span>
+                    </span>
+                    <span className="text-[9px] font-bold text-slate-400 uppercase tracking-wider">
+                      {nfcScanningActive ? 'USB Port Ready' : nfcSupported ? 'Active' : 'Simulating'}
                     </span>
                   </div>
+                </div>
 
-                  {/* Scanned Student Card details banner */}
-                  {scannedStudentName && (
-                    <div className="mb-4 p-3.5 rounded-xl bg-indigo-500/10 border border-indigo-500/20 text-left flex justify-between items-center animate-fade-in">
-                      <div>
-                        <span className="text-[9px] font-bold text-indigo-400 uppercase tracking-wide">Scanned Student Card</span>
-                        <p className="text-xs font-bold text-slate-200 mt-0.5">{scannedStudentName} ({scannedStudentClass})</p>
-                      </div>
-                      <button 
-                        type="button"
-                        onClick={() => {
-                          setScannedStudentName('');
-                          setScannedStudentClass('');
-                          setNfcUid('');
-                        }}
-                        className="text-[10px] font-bold text-slate-500 hover:text-rose-400 transition cursor-pointer"
-                      >
-                        Disconnect
-                      </button>
-                    </div>
-                  )}
-
-                  {/* SELECT TEST CARD */}
-                  <div className="space-y-1.5 mb-5 text-left">
-                    <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wide">
-                      SELECT TEST CARD
-                    </label>
-                    <select
-                      value={nfcUid}
-                      onChange={(e) => setNfcUid(e.target.value)}
-                      className="w-full bg-slate-950 border border-slate-900 rounded-xl px-3 py-2.5 text-xs font-semibold text-slate-200 focus:outline-none focus:border-indigo-500 transition cursor-pointer"
-                    >
-                      <option value="">-- Choose Card to Test --</option>
-                      {students.filter((s: any) => s.nfcUid).map((s: any) => (
-                        <option key={s.id} value={s.nfcUid}>
-                          {s.name} ({s.class}) - Card: {s.nfcUid}
-                        </option>
-                      ))}
-                      <option value="123456789">Mock Card: 123456789 (Alex Mercer)</option>
-                      <option value="999999999">Mock Unregistered: 999999999</option>
-                    </select>
+                {/* Digital Terminal Screen */}
+                <div className="w-full bg-slate-950 p-4 rounded-xl border border-slate-900 flex flex-col justify-between font-mono relative overflow-hidden group shadow-inner">
+                  {/* Grid Lines Overlay for Digital Screen effect */}
+                  <div className="absolute inset-0 bg-[linear-gradient(rgba(18,24,38,0.1)_50%,rgba(0,0,0,0.3)_50%)] bg-[length:100%_4px] pointer-events-none opacity-20" />
+                  
+                  <div className="flex justify-between items-start z-10">
+                    <span className="text-[9px] font-bold text-slate-500 tracking-widest uppercase">
+                      {Object.keys(cart).length === 0 ? 'AWAITING ORDER' : isScanning ? 'READING CARD' : processingTransaction ? 'VALIDATING' : scannedStudentName ? 'CARD VALIDATED' : 'READY TO TAP'}
+                    </span>
+                    <Wifi className={`w-3.5 h-3.5 ${
+                      Object.keys(cart).length > 0 ? 'text-emerald-400 animate-pulse' : 'text-slate-600'
+                    }`} />
                   </div>
 
-                  {/* Large Circular Interactive Scanner Button (CampusOne Logo style) */}
-                  <div className="flex flex-col items-center justify-center my-6 py-2">
-                    <button
-                      type="button"
-                      onClick={triggerNfcScan}
-                      disabled={processingTransaction || isScanning || !nfcUid}
-                      className={`w-36 h-36 rounded-full bg-slate-950 border-2 ${
-                        isScanning 
-                          ? 'border-emerald-500 shadow-lg shadow-emerald-500/20' 
-                          : 'border-slate-800 hover:border-emerald-500/40'
-                      } relative flex flex-col items-center justify-center cursor-pointer transition duration-300 shadow-inner group overflow-hidden`}
+                  <div className="my-3 z-10 flex justify-between items-baseline">
+                    <span className="text-2xl font-black font-heading text-emerald-400 tracking-wider">
+                      ₹{Object.keys(cart).length > 0 ? getCartTotal().toFixed(2) : '0.00'}
+                    </span>
+                    {Object.keys(cart).length > 0 && !scannedStudentName && (
+                      <span className="text-[10px] text-slate-500 animate-pulse">TAP NFC CARD NOW</span>
+                    )}
+                  </div>
+                </div>
+              </div>
+
+              {/* Scanned Student Card Details Identity Badge */}
+              {scannedStudentName && (
+                <div className="mt-4 p-3.5 rounded-xl bg-gradient-to-r from-indigo-950/40 to-slate-950 border border-indigo-900/40 flex justify-between items-center relative overflow-hidden animate-fade-in group">
+                  <div className="absolute top-0 right-0 w-24 h-24 bg-indigo-500/5 rounded-full blur-xl pointer-events-none" />
+                  <div className="flex gap-3 items-center z-10">
+                    {/* Mock Digital Card Chip */}
+                    <div className="w-8 h-6 rounded bg-amber-500/10 border border-amber-500/20 flex flex-col justify-between p-1 flex-shrink-0">
+                      <div className="grid grid-cols-3 gap-0.5 w-full h-full opacity-60">
+                        <div className="border border-amber-500/30 rounded-xs" />
+                        <div className="border border-amber-500/30 rounded-xs" />
+                        <div className="border border-amber-500/30 rounded-xs" />
+                        <div className="border border-amber-500/30 rounded-xs" />
+                        <div className="border border-amber-500/30 rounded-xs" />
+                        <div className="border border-amber-500/30 rounded-xs" />
+                      </div>
+                    </div>
+                    <div>
+                      <span className="text-[9px] font-extrabold text-indigo-400 uppercase tracking-widest block">IDENTIFIED STUDENT</span>
+                      <p className="text-xs font-bold text-slate-200 mt-0.5">{scannedStudentName}</p>
+                      <p className="text-[9px] text-slate-400 font-semibold mt-0.5">Grade: {scannedStudentClass} • UID: {nfcUid}</p>
+                    </div>
+                  </div>
+                  <button 
+                    type="button"
+                    onClick={() => {
+                      setScannedStudentName('');
+                      setScannedStudentClass('');
+                      setNfcUid('');
+                    }}
+                    className="z-10 text-[9px] font-bold text-slate-500 hover:text-rose-450 bg-slate-950 px-2 py-1 rounded-lg border border-slate-905 hover:border-rose-500/20 transition cursor-pointer"
+                  >
+                    Reset
+                  </button>
+                </div>
+              )}
+
+              {/* NFC Scanner interactive graphic area */}
+              {Object.keys(cart).length > 0 && (
+                <div className="mt-4 border-t border-slate-900/60 pt-4 flex flex-col items-center justify-center">
+                  <button
+                    type="button"
+                    onClick={triggerNfcScan}
+                    disabled={processingTransaction || isScanning || !nfcUid}
+                    className={`w-32 h-32 rounded-full bg-slate-950 border-2 ${
+                      isScanning 
+                        ? 'border-emerald-500 shadow-[0_0_15px_rgba(16,185,129,0.25)] scale-98' 
+                        : 'border-slate-900 hover:border-indigo-500/40 hover:scale-102'
+                    } relative flex flex-col items-center justify-center cursor-pointer transition-all duration-300 group overflow-hidden`}
+                  >
+                    {isScanning && (
+                      <div className="absolute inset-0 rounded-full border border-emerald-500/30 animate-ping" />
+                    )}
+                    
+                    {/* Concentric Signal Arcs & Card SVG */}
+                    <svg 
+                      viewBox="0 0 100 100" 
+                      className={`w-20 h-20 transition duration-300 ${isScanning ? 'scale-105' : 'group-hover:scale-105'}`}
                     >
-                      {isScanning && (
-                        <div className="absolute inset-0 rounded-full border border-emerald-500 animate-ping opacity-75" />
-                      )}
+                      {/* Arcs styled cleanly so they do not overlap */}
+                      <path 
+                        d="M 32 20 A 30 30 0 0 0 12 50 A 30 30 0 0 0 32 80" 
+                        fill="none" 
+                        stroke={isScanning ? '#10b981' : '#6366f1'} 
+                        strokeWidth="3.5" 
+                        strokeLinecap="round"
+                        className={isScanning ? 'animate-pulse' : 'opacity-40 group-hover:opacity-85 transition duration-300'}
+                      />
+                      <path 
+                        d="M 39 28 A 22 22 0 0 0 24 50 A 22 22 0 0 0 39 72" 
+                        fill="none" 
+                        stroke={isScanning ? '#10b981' : '#6366f1'} 
+                        strokeWidth="3.5" 
+                        strokeLinecap="round"
+                        className={isScanning ? 'animate-pulse' : 'opacity-60 group-hover:opacity-95 transition duration-300'}
+                      />
+                      <path 
+                        d="M 46 36 A 14 14 0 0 0 36 50 A 14 14 0 0 0 46 64" 
+                        fill="none" 
+                        stroke={isScanning ? '#10b981' : '#6366f1'} 
+                        strokeWidth="3.5" 
+                        strokeLinecap="round"
+                        className={isScanning ? 'animate-pulse' : 'opacity-80 group-hover:opacity-100 transition duration-300'}
+                      />
                       
-                      {/* Concentric Green Arcs and Hand Icon SVG (matching the logo) */}
-                      <svg 
-                        viewBox="0 0 100 100" 
-                        className={`w-24 h-24 transition duration-300 ${isScanning ? 'scale-105' : 'group-hover:scale-105'}`}
-                      >
-                        {/* Concentric Arcs on the left */}
-                        <path 
-                          d="M 35 15 A 35 35 0 0 0 15 50" 
+                      {/* Card rotated on the right */}
+                      <g transform="rotate(-10 65 50)">
+                        <rect 
+                          x="52" 
+                          y="38" 
+                          width="26" 
+                          height="18" 
+                          rx="2" 
                           fill="none" 
-                          stroke="#10b981" 
-                          strokeWidth="4" 
-                          strokeLinecap="round"
-                          className={isScanning ? 'animate-pulse' : ''}
+                          stroke={isScanning ? '#10b981' : '#a5b4fc'} 
+                          strokeWidth="3" 
                         />
-                        <path 
-                          d="M 42 22 A 28 28 0 0 0 22 50" 
-                          fill="none" 
-                          stroke="#10b981" 
-                          strokeWidth="4" 
-                          strokeLinecap="round"
-                          className={isScanning ? 'animate-pulse' : ''}
+                        <rect 
+                          x="56" 
+                          y="43" 
+                          width="4" 
+                          height="3" 
+                          fill={isScanning ? '#10b981' : '#a5b4fc'} 
                         />
-                        <path 
-                          d="M 49 29 A 21 21 0 0 0 29 50" 
-                          fill="none" 
-                          stroke="#10b981" 
-                          strokeWidth="4" 
-                          strokeLinecap="round"
-                          className={isScanning ? 'animate-pulse' : ''}
+                        <line 
+                          x1="52" 
+                          y1="49" 
+                          x2="78" 
+                          y2="49" 
+                          stroke={isScanning ? '#10b981' : '#a5b4fc'} 
+                          strokeWidth="1.5" 
                         />
-                        
-                        {/* Hand holding Credit Card on the right */}
-                        <g transform="rotate(-15 60 50)">
-                          {/* Card */}
-                          <rect 
-                            x="46" 
-                            y="36" 
-                            width="30" 
-                            height="20" 
-                            rx="2" 
-                            fill="none" 
-                            stroke="#10b981" 
-                            strokeWidth="3.5" 
-                          />
-                          {/* Chip */}
-                          <rect 
-                            x="50" 
-                            y="42" 
-                            width="5" 
-                            height="4" 
-                            fill="#10b981" 
-                          />
-                          {/* Card stripe */}
-                          <line 
-                            x1="46" 
-                            y1="49" 
-                            x2="76" 
-                            y2="49" 
-                            stroke="#10b981" 
-                            strokeWidth="1.5" 
-                          />
-                        </g>
-                        
-                        {/* Hand/Fingers holding card */}
-                        <path 
-                          d="M 68 54 C 72 58, 76 62, 78 68 C 79 72, 77 75, 73 75 C 69 75, 64 71, 61 69 L 55 64" 
-                          fill="none" 
-                          stroke="#10b981" 
-                          strokeWidth="3.5" 
-                          strokeLinecap="round"
-                        />
-                      </svg>
+                      </g>
+                    </svg>
 
-                      {/* Hover Ring Label */}
-                      <span className="absolute bottom-3 text-[10px] font-extrabold text-slate-500 group-hover:text-emerald-400 uppercase tracking-widest transition">
-                        {isScanning ? 'READING...' : 'TAP CARD'}
-                      </span>
-                    </button>
-
-                    <span className="text-[10px] text-slate-400 font-semibold mt-3">
-                      {isScanning ? 'Reading card. Validating with backend...' : 'Click button above to scan NFC Card'}
+                    <span className={`absolute bottom-3.5 text-[9px] font-extrabold tracking-widest transition ${
+                      isScanning ? 'text-emerald-400' : 'text-slate-600 group-hover:text-indigo-400'
+                    }`}>
+                      {isScanning ? 'READING' : 'TAP HERE'}
                     </span>
-                  </div>
+                  </button>
 
-                  {/* Manual Override Text Input */}
-                  <div className="space-y-1.5 text-left border-t border-slate-900/40 pt-4">
-                    <label className="text-[9px] font-bold text-slate-500 uppercase tracking-wide">
-                      MANUAL CARD UID OVERRIDE
-                    </label>
-                    <div className="relative">
-                      <CreditCard className="absolute left-3 top-2.5 w-4 h-4 text-slate-500" />
-                      <input
-                        type="text"
-                        required
+                  <span className="text-[10px] text-slate-500 font-semibold mt-3 text-center">
+                    {isScanning ? 'Reading hardware identifier...' : 'Tap physical card or simulate scan below'}
+                  </span>
+                </div>
+              )}
+
+              {/* Simulation Controls Grid - preventing overlaps */}
+              {Object.keys(cart).length > 0 && (
+                <div className="mt-4 pt-4 border-t border-slate-900/60 space-y-3">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div className="space-y-1">
+                      <label className="text-[9px] font-extrabold text-slate-500 uppercase tracking-wider block">
+                        Simulation Mode
+                      </label>
+                      <select
                         value={nfcUid}
                         onChange={(e) => setNfcUid(e.target.value)}
-                        placeholder="Type card UID"
-                        className="w-full pl-9 pr-4 py-2 bg-slate-950 border border-slate-900 rounded-xl focus:border-indigo-500 focus:outline-none text-xs font-semibold text-slate-200 placeholder-slate-700"
-                      />
+                        className="w-full bg-slate-950 border border-slate-900 rounded-lg px-2.5 py-2 text-[10px] font-semibold text-slate-300 focus:outline-none focus:border-indigo-500 transition cursor-pointer"
+                      >
+                        <option value="">-- Choose Card --</option>
+                        {students.filter((s: any) => s.nfcUid).map((s: any) => (
+                          <option key={s.id} value={s.nfcUid}>
+                            {s.name} ({s.class})
+                          </option>
+                        ))}
+                        <option value="123456789">Mock Alex (123456789)</option>
+                        <option value="999999999">Mock New Card (999999999)</option>
+                      </select>
+                    </div>
+
+                    <div className="space-y-1">
+                      <label className="text-[9px] font-extrabold text-slate-500 uppercase tracking-wider block">
+                        Manual Override
+                      </label>
+                      <div className="relative">
+                        <CreditCard className="absolute left-2.5 top-2.5 w-3.5 h-3.5 text-slate-600" />
+                        <input
+                          type="text"
+                          required
+                          value={nfcUid}
+                          onChange={(e) => setNfcUid(e.target.value)}
+                          placeholder="Type UID"
+                          className="w-full pl-8 pr-2.5 py-1.5 bg-slate-950 border border-slate-900 rounded-lg focus:border-indigo-500 focus:outline-none text-[10px] font-semibold text-slate-300 placeholder-slate-800"
+                        />
+                      </div>
                     </div>
                   </div>
+
+                  <button
+                    type="button"
+                    onClick={handleCheckoutSubmit}
+                    disabled={processingTransaction || !nfcUid}
+                    className="w-full py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs rounded-xl shadow-md shadow-indigo-600/10 cursor-pointer transition flex justify-center items-center gap-1.5 disabled:opacity-50"
+                  >
+                    {processingTransaction ? (
+                      <>
+                        <RefreshCw className="w-3.5 h-3.5 animate-spin" />
+                        Processing...
+                      </>
+                    ) : (
+                      <>
+                        <CreditCard className="w-3.5 h-3.5" />
+                        Confirm & Pay (₹{getCartTotal().toFixed(2)})
+                      </>
+                    )}
+                  </button>
+                </div>
+              )}
+
+              {/* Helper for empty cart */}
+              {Object.keys(cart).length === 0 && (
+                <div className="py-6 flex flex-col items-center justify-center text-center space-y-2">
+                  <CreditCard className="w-8 h-8 text-slate-800" />
+                  <p className="text-[11px] text-slate-500 max-w-[200px]">Add food items to your order to wake up the terminal antenna.</p>
                 </div>
               )}
             </div>
@@ -1096,7 +1184,7 @@ export default function StaffDashboard() {
                   </div>
                   <div className="flex justify-between border-b border-slate-800/60 pb-2">
                     <span className="text-xs text-slate-400">Student Card:</span>
-                    <span className="text-sm font-semibold text-slate-200">{transactionResult.transaction.studentId ? 'Alex Mercer' : 'Student'}</span>
+                    <span className="text-sm font-semibold text-slate-200">{scannedStudentName || 'Student'}</span>
                   </div>
                   <div className="text-[10px] text-slate-500 flex items-start gap-1 mt-3">
                     <Info className="w-3.5 h-3.5 flex-shrink-0 text-indigo-400" />
@@ -1173,7 +1261,7 @@ export default function StaffDashboard() {
                 <select
                   value={quickRegisterParentId}
                   onChange={(e) => setQuickRegisterParentId(e.target.value)}
-                  className="w-full bg-slate-950 border border-slate-900 rounded-xl px-3.5 py-3 text-xs text-slate-205 focus:outline-none focus:border-indigo-500 transition cursor-pointer"
+                  className="w-full bg-slate-950 border border-slate-900 rounded-xl px-3.5 py-3 text-xs text-slate-200 focus:outline-none focus:border-indigo-500 transition cursor-pointer"
                   required
                 >
                   <option value="">-- Choose Parent --</option>
