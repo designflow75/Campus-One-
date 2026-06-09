@@ -47,5 +47,5 @@ app.post('/api/pay', async (req, res) => {
     }
 });
 
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 3002;
 app.listen(PORT, () => console.log(`Portal online at port ${PORT}`));
