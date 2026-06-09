@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CampusOne Operations Portal</title>
+    <style>
+        body { font-family: sans-serif; padding: 20px; background: #f4f6f9; }
+        .card { background: white; padding: 20px; margin-bottom: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        button { background: #007bff; color: white; padding: 10px 15px; border: none; border-radius: 4px; cursor: pointer; }
+        input, select { padding: 8px; margin: 5px 0; width: 100%; max-width: 300px; display: block; }
+    </style>
+</head>
+<body>
+
+    <h1>CampusOne Core Dashboard</h1>
+
+    <div class="card">
+        <h2>Admin Panel: Assign New Card ID</h2>
+        <label>Student Full Name:</label>
+        <input type="text" id="studentName" placeholder="Enter name">
+        
+        <label>Tap Card on USB Reader (UID auto-focus field):</label>
+        <input type="text" id="adminCardUid" placeholder="Waiting for card hardware scan...">
+        
+        <button onclick="registerNewCard()">Assign & Activate Card Permission</button>
+    </div>
+
+    <div class="card">
+        <h2>Canteen Operations: Checkout Terminal</h2>
+        <label>Select Item:</label>
+        <select id="foodItem">
+            <option value="Samosa" data-price="20">Samosa - ₹20</option>
+            <option value="Lunch Meal" data-price="80">Full Lunch Meal - ₹80</option>
+            <option value="Fruit Juice" data-price="40">Fruit Juice - ₹40</option>
+        </select>
+        
+        <button style="background: #28a745;" onclick="activateCanteenNfcScan()">Start Web NFC Payment Listener</button>
+        <p id="canteenStatus">Status: Ready to process orders.</p>
+    </div>
+
+    <script>
+        // Dynamically fall back to port 3002 for local testing, otherwise use the hosted URL
+        const BACKEND_URL = window.location.origin.includes('localhost') || window.location.origin.includes('127.0.0.1')
+            ? "http://localhost:3002"
+            : "https://your-antigravity-live-backend.com"; // Set dynamically later
+
+        // Admin Registration Logic (USB reader acts as an automated input tool)
+        async function registerNewCard() {
+            const name = document.getElementById('studentName').value;
+            const uid = document.getElementById('adminCardUid').value;
+
+            if(!name || !uid) return alert("Please fill out all assignment inputs.");
+
+            const res = await fetch(`${BACKEND_URL}/api/admin/register-card`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ studentName: name, cardUid: uid })
+            });
+            const data = await res.json();
+            if(data.success) {
+                alert("Success! Profile linked.");
+                document.getElementById('studentName').value = '';
+                document.getElementById('adminCardUid').value = '';
+            }
+        }
+
+        // Canteen Mobile Web NFC API Execution (For Chrome on Android)
+        async function activateCanteenNfcScan() {
+            const itemSelect = document.getElementById('foodItem');
+            const selectedItem = itemSelect.value;
+            const selectedAmount = itemSelect.options[itemSelect.selectedIndex].getAttribute('data-price');
+            const statusLabel = document.getElementById('canteenStatus');
+
+            if (!('NDEFReader' in window)) {
+                statusLabel.innerText = "Error: Web NFC is not supported. Use Chrome on Android over HTTPS.";
+                return;
+            }
+
+            try {
+                statusLabel.innerText = "Listening... Hold Student ID card against back of smartphone.";
+                const ndef = new NDEFReader();
+                await ndef.scan();
+
+                ndef.addEventListener("reading", async ({ serialNumber }) => {
+                    statusLabel.innerText = `Processing detected Card UID: ${serialNumber}...`;
+                    
+                    // Transmit data secure to cloud logic
+                    const response = await fetch(`${BACKEND_URL}/api/canteen/pay`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            cardUid: serialNumber,
+                            item: selectedItem,
+                            amount: parseFloat(selectedAmount)
+                        })
+                    });
+
+                    const paymentResult = await response.json();
+                    if(paymentResult.success) {
+                        statusLabel.innerHTML = `<b style="color:green">Payment Approved!</b> Thank you, ${paymentResult.studentName}.`;
+                    } else {
+                        statusLabel.innerHTML = `<b style="color:red">Transaction Failed:</b> ${paymentResult.error}`;
+                    }
+                });
+
+            } catch (error) {
+                statusLabel.innerText = `System Error starting sensor: ${error}`;
+            }
+        }
+    </script>
+</body>
+</html>
