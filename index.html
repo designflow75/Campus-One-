@@ -55,7 +55,7 @@
             background-size: 24px 24px;
             background-position: 0 0, 12px 12px;
             color: var(--text-primary);
-            min-h: 100vh;
+            min-height: 100vh;
             display: flex;
             flex-direction: column;
             overflow-x: hidden;
@@ -114,7 +114,6 @@
             gap: 16px;
         }
 
-        /* Toggle Button styling */
         .theme-toggle-btn {
             background: none;
             border: 1px solid var(--border-color);
@@ -164,7 +163,6 @@
             width: 100%;
         }
 
-        /* Auth Screen layout */
         .auth-container {
             max-width: 420px;
             margin: 0 auto;
@@ -187,7 +185,6 @@
             color: var(--text-secondary);
         }
 
-        /* Forms Elements */
         .form-group {
             margin-bottom: 20px;
             display: flex;
@@ -242,22 +239,18 @@
             transform: scale(0.99);
         }
 
-        /* Dashboard View layout */
         .dashboard-grid {
             display: grid;
             grid-template-cols: 1fr;
             gap: 24px;
-        }
-
-        @media (min-width: 768px) {
-            .dashboard-grid {
-                grid-template-columns: 1fr 1fr;
-            }
+            max-width: 800px;
+            margin: 0 auto;
+            width: 100%;
         }
 
         .welcome-hero {
-            grid-column: 1 / -1;
             margin-bottom: 8px;
+            text-align: center;
         }
 
         .welcome-hero h2 {
@@ -272,7 +265,6 @@
             font-size: 0.95rem;
         }
 
-        /* Status Badge for active state */
         .status-badge {
             display: inline-flex;
             align-items: center;
@@ -294,61 +286,161 @@
             box-shadow: 0 0 8px var(--accent-color);
         }
 
-        /* Keypad UI for secure PIN setup */
-        .pin-display-container {
-            display: flex;
-            justify-content: center;
-            gap: 16px;
-            margin: 24px 0;
-        }
-
-        .pin-dot {
-            width: 20px;
-            height: 20px;
-            border-radius: 50%;
-            border: 2px solid var(--border-color);
-            transition: all 0.15s ease;
-        }
-
-        .pin-dot.filled {
-            background-color: var(--accent-color);
-            border-color: var(--accent-color);
-            box-shadow: 0 0 10px var(--accent-glow);
-            transform: scale(1.1);
-        }
-
-        .keypad-grid {
+        /* Wallet Dashboard Info */
+        .wallet-card-container {
             display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 12px;
-            max-width: 280px;
-            margin: 0 auto;
+            grid-template-columns: 1fr;
+            gap: 20px;
         }
 
-        .key-btn {
+        @media (min-width: 768px) {
+            .wallet-card-container {
+                grid-template-columns: 1.2fr 0.8fr;
+            }
+        }
+
+        .smart-card {
+            background: linear-gradient(135deg, #1e1b4b 0%, #311042 100%);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            padding: 24px;
+            color: white;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            min-height: 200px;
+        }
+
+        .smart-card::before {
+            content: '';
+            position: absolute;
+            top: -20%;
+            right: -20%;
+            width: 150px;
+            height: 150px;
+            background: rgba(16, 185, 129, 0.15);
+            border-radius: 50%;
+            filter: blur(40px);
+        }
+
+        .card-chip {
+            width: 42px;
+            height: 32px;
+            background: linear-gradient(135deg, #e2e8f0 0%, #94a3b8 100%);
+            border-radius: 6px;
+            position: relative;
+            margin-bottom: 20px;
+        }
+
+        .card-balance-label {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        .card-balance {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 2.25rem;
+            font-weight: 700;
+            margin: 4px 0 12px;
+        }
+
+        .card-student-name {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 1.1rem;
+            font-weight: 600;
+            letter-spacing: 0.02em;
+        }
+
+        .card-nfc-tag {
+            font-size: 0.7rem;
+            color: rgba(255, 255, 255, 0.4);
+            font-family: monospace;
+            margin-top: 4px;
+        }
+
+        .action-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            justify-content: center;
+        }
+
+        .action-btn {
             background: var(--input-bg);
             border: 1px solid var(--border-color);
             color: var(--text-primary);
-            font-family: 'Space Grotesk', sans-serif;
-            font-size: 1.25rem;
-            font-weight: 600;
-            padding: 16px;
+            padding: 14px;
             border-radius: 12px;
             cursor: pointer;
-            transition: all 0.1s ease;
+            font-weight: 600;
+            font-size: 0.9rem;
             display: flex;
             align-items: center;
             justify-content: center;
-            user-select: none;
+            gap: 8px;
+            transition: all 0.2s ease;
         }
 
-        .key-btn:hover {
+        .action-btn:hover {
             border-color: var(--accent-color);
             background: var(--card-bg);
         }
 
-        .key-btn:active {
-            transform: scale(0.95);
+        .action-btn.primary {
+            background: var(--accent-gradient);
+            color: white;
+            border: none;
+        }
+
+        .action-btn.primary:hover {
+            opacity: 0.9;
+        }
+
+        /* Top-up Form Overlay Modal */
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.75);
+            backdrop-filter: blur(4px);
+            z-index: 1000;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .modal-content {
+            background: var(--bg-color);
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            padding: 28px;
+            width: 100%;
+            max-width: 360px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            position: relative;
+        }
+
+        .close-modal {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: none;
+            border: none;
+            color: var(--text-secondary);
+            cursor: pointer;
+            font-size: 1.2rem;
+        }
+
+        .close-modal:hover {
+            color: var(--text-primary);
         }
 
         /* Alert notifications */
@@ -389,7 +481,6 @@
             height: 20px;
         }
 
-        /* View Switching animations */
         .view-section {
             display: none;
         }
@@ -404,7 +495,6 @@
             to { opacity: 1; transform: translateY(0); }
         }
 
-        /* Footer styling */
         footer {
             text-align: center;
             padding: 24px 0;
@@ -445,8 +535,8 @@
     <div class="view-section active" id="authView">
         <div class="glass-card auth-container">
             <div class="auth-header">
-                <h1>Parent Dashboard</h1>
-                <p>Register or sign in to configure your student's canteen limits and secure security PIN.</p>
+                <h1>Parent Welcome Portal</h1>
+                <p>Sign in or auto-register to configure your student's cashless smart canteen profile.</p>
             </div>
             <form id="authForm" onsubmit="handleAuth(event)">
                 <div class="form-group">
@@ -467,62 +557,88 @@
         <div class="dashboard-grid">
             <!-- Hero Header banner -->
             <div class="welcome-hero">
-                <h2>Canteen Wallet Dashboard</h2>
-                <p>Welcome, <span id="parentEmailDisplay" style="font-weight: 600; color: var(--accent-color);">parent@example.com</span>. Manage your child's profile details below.</p>
+                <h2>CampusOne Dashboard</h2>
+                <p>Welcome, <span id="parentEmailDisplay" style="font-weight: 600; color: var(--accent-color);">parent@example.com</span></p>
             </div>
 
-            <!-- Card A: Student Profile Setup -->
-            <div class="glass-card">
+            <!-- VIEW A: Subscription Setup Form (Shown when no child is set up) -->
+            <div class="glass-card" id="subscriptionSetupSection" style="display: none;">
                 <div class="status-badge">
                     <span class="status-dot"></span>
-                    <span>Student Profile Setup</span>
+                    <span>Student Profile & Subscription</span>
                 </div>
-                <form id="profileForm" onsubmit="saveProfile(event)">
+                
+                <form id="subscriptionForm" onsubmit="handleSubscription(event)" style="margin-top: 10px;">
                     <div class="form-group">
                         <label for="studentNameInput">Student's Full Name</label>
                         <input type="text" id="studentNameInput" required placeholder="e.g. Alex Mercer">
                     </div>
-                    <button type="submit" class="submit-btn" style="margin-top: 12px;">Save Profile Details</button>
+                    
+                    <div class="grid-pin-fields" style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+                        <div class="form-group">
+                            <label for="walletPinInput">Wallet PIN (4 Digits)</label>
+                            <input type="password" id="walletPinInput" required placeholder="••••" maxlength="4" pattern="[0-9]{4}" inputmode="numeric">
+                        </div>
+                        <div class="form-group">
+                            <label for="confirmPinInput">Confirm Wallet PIN</label>
+                            <input type="password" id="confirmPinInput" required placeholder="••••" maxlength="4" pattern="[0-9]{4}" inputmode="numeric">
+                        </div>
+                    </div>
+
+                    <button type="submit" class="submit-btn" style="margin-top: 16px;">Save & Subscribe Wallet</button>
                 </form>
-                <div id="profileSavedIndicator" style="margin-top: 20px; font-size: 0.85rem; color: var(--text-secondary); display: none;">
-                    ✅ Active Child: <strong id="activeStudentLabel" style="color: var(--text-primary);">None</strong>
+            </div>
+
+            <!-- VIEW B: Smart Card & Balance Panel (Shown when student is registered) -->
+            <div class="glass-card" id="studentDashboardSection" style="display: none;">
+                <div class="status-badge" style="border-color: rgba(16, 185, 129, 0.45);">
+                    <span class="status-dot"></span>
+                    <span>Active Subscription Card</span>
+                </div>
+
+                <div class="wallet-card-container">
+                    <!-- The Digital Smart Card -->
+                    <div class="smart-card">
+                        <div>
+                            <div class="card-chip"></div>
+                            <div class="card-balance-label">Cashless Wallet Balance</div>
+                            <div class="card-balance">₹<span id="activeBalanceDisplay">0.00</span></div>
+                        </div>
+                        <div>
+                            <div class="card-student-name" id="activeStudentNameDisplay">Alex Mercer</div>
+                            <div class="card-nfc-tag" id="activeCardUidDisplay">NFC ID: Not Assigned</div>
+                        </div>
+                    </div>
+
+                    <!-- Action items list -->
+                    <div class="action-list">
+                        <button class="action-btn primary" onclick="openTopupModal()">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="18" height="18"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                            Add Wallet Funds
+                        </button>
+                        <button class="action-btn" onclick="editSubscriptionSettings()">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                            Update Profile & PIN
+                        </button>
+                    </div>
                 </div>
             </div>
 
-            <!-- Card B: Campus PIN Security Manager -->
-            <div class="glass-card">
-                <div class="status-badge" style="border-color: rgba(99, 102, 241, 0.45);">
-                    <span class="status-dot" style="background-color: #6366f1; box-shadow: 0 0 8px #6366f1;"></span>
-                    <span>Security PIN Manager</span>
-                </div>
-                <p style="font-size: 0.8rem; color: var(--text-secondary); margin-bottom: 15px; line-height: 1.5;">
-                    Configure a secure 4-digit Campus Security PIN. Your child will use this to authorize cashier deductions at the canteen checkout.
-                </p>
+        </div>
+    </div>
 
-                <!-- PIN Keypad Display -->
-                <div class="pin-display-container">
-                    <div class="pin-dot" id="dot0"></div>
-                    <div class="pin-dot" id="dot1"></div>
-                    <div class="pin-dot" id="dot2"></div>
-                    <div class="pin-dot" id="dot3"></div>
+    <!-- Top-up Modal -->
+    <div class="modal" id="topupModal">
+        <div class="modal-content">
+            <button class="close-modal" onclick="closeTopupModal()">×</button>
+            <h3 style="font-family: 'Space Grotesk', sans-serif; margin-bottom: 16px;">Top Up Wallet</h3>
+            <form id="topupForm" onsubmit="handleTopup(event)">
+                <div class="form-group">
+                    <label for="topupAmount">Amount (₹)</label>
+                    <input type="number" id="topupAmount" required value="200" min="10">
                 </div>
-
-                <!-- Virtual Keypad Grid -->
-                <div class="keypad-grid">
-                    <button type="button" class="key-btn" onclick="pressKey('1')">1</button>
-                    <button type="button" class="key-btn" onclick="pressKey('2')">2</button>
-                    <button type="button" class="key-btn" onclick="pressKey('3')">3</button>
-                    <button type="button" class="key-btn" onclick="pressKey('4')">4</button>
-                    <button type="button" class="key-btn" onclick="pressKey('5')">5</button>
-                    <button type="button" class="key-btn" onclick="pressKey('6')">6</button>
-                    <button type="button" class="key-btn" onclick="pressKey('7')">7</button>
-                    <button type="button" class="key-btn" onclick="pressKey('8')">8</button>
-                    <button type="button" class="key-btn" onclick="pressKey('9')">9</button>
-                    <button type="button" class="key-btn" onclick="pressKey('clear')" style="font-size: 0.875rem; color: #ef4444;">Clear</button>
-                    <button type="button" class="key-btn" onclick="pressKey('0')">0</button>
-                    <button type="button" class="key-btn" onclick="savePin()" style="font-size: 0.875rem; color: var(--accent-color); font-weight: 700;">Save</button>
-                </div>
-            </div>
+                <button type="submit" class="submit-btn" style="margin-top: 10px;">Authorize Payment</button>
+            </form>
         </div>
     </div>
 
@@ -534,7 +650,6 @@
 
 <!-- Notification Toast System -->
 <div class="notification-toast" id="toast">
-    <!-- Icon Placeholder -->
     <span id="toastIcon"></span>
     <span id="toastMessage" style="font-size: 0.875rem; font-weight: 600;">Message here</span>
 </div>
@@ -544,11 +659,9 @@
     const state = {
         parentId: null,
         email: '',
-        student: null,
-        currentPinInput: ''
+        student: null
     };
 
-    // Auto check if parent is logged in
     window.addEventListener('load', () => {
         const savedParent = localStorage.getItem('parentUser');
         if (savedParent) {
@@ -557,7 +670,6 @@
         }
     });
 
-    // Theme Switch Engine
     function toggleTheme() {
         const html = document.documentElement;
         const currentTheme = html.getAttribute('data-theme');
@@ -575,7 +687,6 @@
         }
     }
 
-    // Auth Submission
     async function handleAuth(event) {
         event.preventDefault();
         const email = document.getElementById('authEmail').value;
@@ -606,18 +717,130 @@
         state.email = data.email;
         state.student = data.student;
 
-        // Update UI displays
         document.getElementById('parentEmailDisplay').innerText = data.email;
         document.getElementById('logoutBtn').style.display = 'flex';
         
-        if (data.student) {
-            document.getElementById('studentNameInput').value = data.student.name;
-            updateProfileIndicator(data.student.name);
-            highlightPinDots(data.student.campus_pin.length);
-            state.currentPinInput = data.student.campus_pin;
+        renderDashboardView();
+        switchView('dashboardView');
+    }
+
+    function renderDashboardView() {
+        const setupSection = document.getElementById('subscriptionSetupSection');
+        const dashboardSection = document.getElementById('studentDashboardSection');
+
+        if (state.student) {
+            setupSection.style.display = 'none';
+            
+            // Populate dashboard
+            document.getElementById('activeStudentNameDisplay').innerText = state.student.name;
+            document.getElementById('activeCardUidDisplay').innerText = state.student.uid 
+                ? `NFC ID: ${state.student.uid}`
+                : `NFC ID: Not Assigned`;
+            document.getElementById('activeBalanceDisplay').innerText = parseFloat(state.student.balance || 0.00).toFixed(2);
+            
+            dashboardSection.style.display = 'block';
+        } else {
+            dashboardSection.style.display = 'none';
+            
+            // Clear subscription fields
+            document.getElementById('studentNameInput').value = '';
+            document.getElementById('walletPinInput').value = '';
+            document.getElementById('confirmPinInput').value = '';
+            
+            setupSection.style.display = 'block';
+        }
+    }
+
+    async function handleSubscription(event) {
+        event.preventDefault();
+        const studentName = document.getElementById('studentNameInput').value;
+        const pin = document.getElementById('walletPinInput').value;
+        const confirmPin = document.getElementById('confirmPinInput').value;
+
+        if (pin !== confirmPin) {
+            showToast('PIN and Confirm PIN do not match!', 'error');
+            return;
         }
 
-        switchView('dashboardView');
+        if (!/^[0-9]{4}$/.test(pin)) {
+            showToast('PIN must be exactly 4 numeric digits.', 'error');
+            return;
+        }
+
+        try {
+            const res = await fetch('/api/parent/setup-subscription', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ parentId: state.parentId, studentName, pin, confirmPin })
+            });
+
+            const data = await res.json();
+            if (data.success) {
+                state.student = data.student;
+                
+                const stored = JSON.parse(localStorage.getItem('parentUser'));
+                stored.student = data.student;
+                localStorage.setItem('parentUser', JSON.stringify(stored));
+
+                renderDashboardView();
+                showToast('Wallet subscription created successfully!', 'success');
+            } else {
+                showToast(data.error || 'Failed to complete subscription.', 'error');
+            }
+        } catch (err) {
+            showToast('Sync error processing subscription.', 'error');
+        }
+    }
+
+    function editSubscriptionSettings() {
+        const setupSection = document.getElementById('subscriptionSetupSection');
+        const dashboardSection = document.getElementById('studentDashboardSection');
+
+        // Populate fields with current values for editing
+        document.getElementById('studentNameInput').value = state.student.name;
+        document.getElementById('walletPinInput').value = '';
+        document.getElementById('confirmPinInput').value = '';
+
+        dashboardSection.style.display = 'none';
+        setupSection.style.display = 'block';
+    }
+
+    function openTopupModal() {
+        document.getElementById('topupModal').style.display = 'flex';
+    }
+
+    function closeTopupModal() {
+        document.getElementById('topupModal').style.display = 'none';
+    }
+
+    async function handleTopup(event) {
+        event.preventDefault();
+        const amount = document.getElementById('topupAmount').value;
+
+        try {
+            const res = await fetch('/api/parent/topup', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ parentId: state.parentId, amount: parseFloat(amount) })
+            });
+
+            const data = await res.json();
+            if (data.success) {
+                state.student.balance = data.newBalance;
+                
+                const stored = JSON.parse(localStorage.getItem('parentUser'));
+                stored.student = state.student;
+                localStorage.setItem('parentUser', JSON.stringify(stored));
+
+                document.getElementById('activeBalanceDisplay').innerText = parseFloat(data.newBalance).toFixed(2);
+                closeTopupModal();
+                showToast('Wallet loaded successfully via Simulated Razorpay Gateway!', 'success');
+            } else {
+                showToast(data.error || 'Top up failed.', 'error');
+            }
+        } catch (err) {
+            showToast('Network error processing payment.', 'error');
+        }
     }
 
     function logout() {
@@ -625,12 +848,9 @@
         state.parentId = null;
         state.email = '';
         state.student = null;
-        state.currentPinInput = '';
         
         document.getElementById('authForm').reset();
         document.getElementById('logoutBtn').style.display = 'none';
-        document.getElementById('profileSavedIndicator').style.display = 'none';
-        highlightPinDots(0);
         
         switchView('authView');
         showToast('Signed out successfully.', 'success');
@@ -643,105 +863,6 @@
         document.getElementById(viewId).classList.add('active');
     }
 
-    // Save Student Profile Name
-    async function saveProfile(event) {
-        event.preventDefault();
-        const studentName = document.getElementById('studentNameInput').value;
-
-        try {
-            const res = await fetch('/api/parent/setup-profile', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ parentId: state.parentId, studentName })
-            });
-
-            const data = await res.json();
-            if (data.success) {
-                state.student = data.student;
-                // Update local storage representation
-                const stored = JSON.parse(localStorage.getItem('parentUser'));
-                stored.student = data.student;
-                localStorage.setItem('parentUser', JSON.stringify(stored));
-
-                updateProfileIndicator(data.student.name);
-                showToast('Student profile saved successfully.', 'success');
-            } else {
-                showToast(data.error || 'Failed to save profile', 'error');
-            }
-        } catch (err) {
-            showToast('Sync error saving profile.', 'error');
-        }
-    }
-
-    function updateProfileIndicator(name) {
-        const indicator = document.getElementById('profileSavedIndicator');
-        const label = document.getElementById('activeStudentLabel');
-        label.innerText = name;
-        indicator.style.display = 'block';
-    }
-
-    // Virtual Numeric Keypad logic
-    function pressKey(key) {
-        if (key === 'clear') {
-            state.currentPinInput = '';
-            highlightPinDots(0);
-            return;
-        }
-
-        if (state.currentPinInput.length < 4) {
-            state.currentPinInput += key;
-            highlightPinDots(state.currentPinInput.length);
-        }
-    }
-
-    function highlightPinDots(count) {
-        for (let i = 0; i < 4; i++) {
-            const dot = document.getElementById(`dot${i}`);
-            if (i < count) {
-                dot.classList.add('filled');
-            } else {
-                dot.classList.remove('filled');
-            }
-        }
-    }
-
-    // Save 4-Digit Security PIN
-    async function savePin() {
-        if (state.currentPinInput.length !== 4) {
-            showToast('Please enter a complete 4-digit PIN.', 'error');
-            return;
-        }
-
-        if (!state.student) {
-            showToast('Please save the student name profile first!', 'error');
-            return;
-        }
-
-        try {
-            const res = await fetch('/api/parent/setup-pin', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ parentId: state.parentId, pin: state.currentPinInput })
-            });
-
-            const data = await res.json();
-            if (data.success) {
-                state.student = data.student;
-                // Update local storage representation
-                const stored = JSON.parse(localStorage.getItem('parentUser'));
-                stored.student = data.student;
-                localStorage.setItem('parentUser', JSON.stringify(stored));
-
-                showToast('Campus security PIN updated successfully!', 'success');
-            } else {
-                showToast(data.error || 'Failed to update PIN', 'error');
-            }
-        } catch (err) {
-            showToast('Connection error updating security PIN.', 'error');
-        }
-    }
-
-    // Toast Alert system
     function showToast(msg, type) {
         const toast = document.getElementById('toast');
         const icon = document.getElementById('toastIcon');
@@ -756,7 +877,6 @@
             icon.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="#ef4444" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>';
         }
 
-        // Clear toast after 3.5 seconds
         setTimeout(() => {
             toast.classList.remove('show');
         }, 3500);
