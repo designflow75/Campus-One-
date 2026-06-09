@@ -30,6 +30,12 @@ export class StudentController {
     return this.studentService.findByParent(req.user.userId);
   }
 
+  @Get('parents')
+  @Roles('ADMIN', 'STAFF')
+  async findParents() {
+    return this.studentService.findParents();
+  }
+
   @Get(':id')
   @Roles('ADMIN', 'PARENT', 'STAFF')
   async findOne(@Param('id') id: string, @Request() req: any) {

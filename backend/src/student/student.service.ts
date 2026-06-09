@@ -200,4 +200,15 @@ export class StudentService {
       where: { studentId },
     });
   }
+
+  async findParents() {
+    return this.prisma.user.findMany({
+      where: { role: 'PARENT' },
+      select: {
+        id: true,
+        name: true,
+        email: true,
+      },
+    });
+  }
 }

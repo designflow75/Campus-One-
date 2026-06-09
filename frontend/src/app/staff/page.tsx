@@ -39,6 +39,20 @@ export default function StaffDashboard() {
   const [nfcPermissionState, setNfcPermissionState] = useState<'prompt' | 'granted' | 'denied' | 'unsupported'>('prompt');
   const [nfcErrorText, setNfcErrorText] = useState('');
 
+  // Scanned Card student display states
+  const [scannedStudentName, setScannedStudentName] = useState('');
+  const [scannedStudentClass, setScannedStudentClass] = useState('');
+
+  // Quick Registration states
+  const [showQuickRegister, setShowQuickRegister] = useState(false);
+  const [quickRegisterUid, setQuickRegisterUid] = useState('');
+  const [quickRegisterName, setQuickRegisterName] = useState('');
+  const [quickRegisterClass, setQuickRegisterClass] = useState('');
+  const [quickRegisterParentId, setQuickRegisterParentId] = useState('');
+  const [parents, setParents] = useState<any[]>([]);
+  const [quickRegisterLoading, setQuickRegisterLoading] = useState(false);
+  const [quickRegisterError, setQuickRegisterError] = useState('');
+
   // Web NFC NDEFReader API integration
   useEffect(() => {
     if (typeof window !== 'undefined' && 'NDEFReader' in window) {
@@ -68,25 +82,7 @@ export default function StaffDashboard() {
       ndef.addEventListener("reading", ({ serialNumber }: any) => {
         const cleanUid = serialNumber.replace(/:/g, '').toUpperCase();
         console.log("Web NFC scanned hardware UID:", cleanUid);
-
-        if (activeTab === 'CHECKOUT') {
-          setNfcUid(cleanUid);
-          setCart((currentCart) => {
-            const cartLines = Object.values(currentCart);
-            if (cartLines.length > 0) {
-              autoCheckout(cleanUid, currentCart);
-            }
-            return currentCart;
-          });
-        } else if (activeTab === 'NFC_REGISTRY') {
-          setNewNfcUid(cleanUid);
-          setSelectedStudentForNfc((currentStudentId) => {
-            if (currentStudentId) {
-              autoLinkNfc(currentStudentId, cleanUid);
-            }
-            return currentStudentId;
-          });
-        }
+        handleNfcInputCaptured(cleanUid);
       });
     } catch (err: any) {
       console.error("Web NFC Error:", err);
@@ -164,6 +160,125 @@ export default function StaffDashboard() {
     }
   };
 
+  const fetchParents = async () => {
+    try {
+      const data = await apiRequest('/students/parents');
+      setParents(data);
+      if (data && data.length > 0) {
+        setQuickRegisterParentId(data[0].id);
+      }
+    } catch (err) {
+      console.error('Error fetching parents:', err);
+    }
+  };
+
+  // 1b. USB Keyboard NFC Reader keydown listener
+  useEffect(() => {
+    let buffer = '';
+    let lastKeyTime = Date.now();
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (
+        e.target instanceof HTMLInputElement ||
+        e.target instanceof HTMLTextAreaElement ||
+        e.target instanceof HTMLSelectElement
+      ) {
+        return;
+      }
+
+      const currentTime = Date.now();
+      const isFast = (currentTime - lastKeyTime) < 50;
+
+      if (e.key === 'Enter') {
+        if (buffer.length >= 4) {
+          console.log("Captured USB NFC reader scan:", buffer);
+          handleNfcInputCaptured(buffer);
+        }
+        buffer = '';
+      } else if (e.key.match(/^[a-zA-Z0-9]$/)) {
+        if (isFast || buffer === '') {
+          buffer += e.key;
+        } else {
+          buffer = e.key;
+        }
+      }
+      lastKeyTime = currentTime;
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [students, activeTab, cart]);
+
+  const handleNfcInputCaptured = async (uid: string) => {
+    const cleanUid = uid.replace(/:/g, '').toUpperCase();
+    console.log("Processing captured NFC UID:", cleanUid);
+
+    const matched = students.find((s: any) => s.nfcUid === cleanUid);
+
+    if (matched) {
+      setNfcUid(cleanUid);
+      setScannedStudentName(matched.name);
+      setScannedStudentClass(matched.class);
+      setNfcErrorText('');
+
+      if (activeTab === 'CHECKOUT') {
+        setCart((currentCart) => {
+          const cartLines = Object.values(currentCart);
+          if (cartLines.length > 0) {
+            autoCheckout(cleanUid, currentCart);
+          }
+          return currentCart;
+        });
+      }
+    } else {
+      setQuickRegisterUid(cleanUid);
+      setQuickRegisterName('');
+      setQuickRegisterClass('');
+      setQuickRegisterError('');
+      setShowQuickRegister(true);
+    }
+  };
+
+  const handleQuickRegisterSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setQuickRegisterError('');
+    setQuickRegisterLoading(true);
+
+    if (!quickRegisterName.trim() || !quickRegisterClass.trim() || !quickRegisterParentId) {
+      setQuickRegisterError('Please fill out all fields.');
+      setQuickRegisterLoading(false);
+      return;
+    }
+
+    try {
+      const result = await apiRequest('/students', {
+        method: 'POST',
+        body: JSON.stringify({
+          name: quickRegisterName.trim(),
+          class: quickRegisterClass.trim(),
+          parentId: quickRegisterParentId,
+          nfcUid: quickRegisterUid,
+        }),
+      });
+
+      const studentsData = await apiRequest('/students');
+      setStudents(studentsData);
+
+      setNfcUid(quickRegisterUid);
+      setScannedStudentName(result.name);
+      setScannedStudentClass(result.class);
+
+      setShowQuickRegister(false);
+      setQuickRegisterUid('');
+      setQuickRegisterName('');
+      setQuickRegisterClass('');
+    } catch (err: any) {
+      setQuickRegisterError(err.message || 'Failed to register student.');
+    } finally {
+      setQuickRegisterLoading(false);
+    }
+  };
+
   // 1. Auth check and initial load
   useEffect(() => {
     const userStr = localStorage.getItem('user');
@@ -180,6 +295,7 @@ export default function StaffDashboard() {
     setStaffName(user.name);
 
     fetchData();
+    fetchParents();
   }, []);
 
   const fetchData = async () => {
@@ -737,6 +853,47 @@ export default function StaffDashboard() {
                     <span className="text-xl font-extrabold text-indigo-400">₹{getCartTotal().toFixed(2)}</span>
                   </div>
 
+                  {/* NFC Reader / USB Connectivity status indicator */}
+                  <div className="mb-4 p-3 bg-slate-950 border border-slate-900 rounded-xl flex items-center justify-between text-left">
+                    <div className="flex items-center gap-2">
+                      <svg viewBox="0 0 24 24" className="w-4 h-4 text-emerald-400" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                        <rect x="2" y="2" width="20" height="8" rx="2" ry="2" />
+                        <rect x="2" y="14" width="20" height="8" rx="2" ry="2" />
+                        <line x1="6" y1="6" x2="6.01" y2="6" />
+                        <line x1="6" y1="18" x2="6.01" y2="18" />
+                      </svg>
+                      <div>
+                        <span className="text-[9px] font-bold text-slate-500 uppercase tracking-wide">NFC Device Status</span>
+                        <p className="text-[10px] font-bold text-slate-300 mt-0.5">USB Port / Reader Ready</p>
+                      </div>
+                    </div>
+                    <span className="flex h-2 w-2 relative">
+                      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                      <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+                    </span>
+                  </div>
+
+                  {/* Scanned Student Card details banner */}
+                  {scannedStudentName && (
+                    <div className="mb-4 p-3.5 rounded-xl bg-indigo-500/10 border border-indigo-500/20 text-left flex justify-between items-center animate-fade-in">
+                      <div>
+                        <span className="text-[9px] font-bold text-indigo-400 uppercase tracking-wide">Scanned Student Card</span>
+                        <p className="text-xs font-bold text-slate-200 mt-0.5">{scannedStudentName} ({scannedStudentClass})</p>
+                      </div>
+                      <button 
+                        type="button"
+                        onClick={() => {
+                          setScannedStudentName('');
+                          setScannedStudentClass('');
+                          setNfcUid('');
+                        }}
+                        className="text-[10px] font-bold text-slate-500 hover:text-rose-400 transition cursor-pointer"
+                      >
+                        Disconnect
+                      </button>
+                    </div>
+                  )}
+
                   {/* SELECT TEST CARD */}
                   <div className="space-y-1.5 mb-5 text-left">
                     <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wide">
@@ -966,6 +1123,101 @@ export default function StaffDashboard() {
             >
               Close Overlay
             </button>
+          </div>
+        </div>
+      )}
+
+      {/* QUICK REGISTRATION MODAL FOR UNREGISTERED CARDS */}
+      {showQuickRegister && (
+        <div className="fixed inset-0 z-50 bg-slate-950/95 backdrop-blur-md flex items-center justify-center p-4">
+          <div className="w-full max-w-md glass-panel p-8 rounded-2xl border border-slate-800 relative overflow-hidden animate-float text-left">
+            <div className="absolute -top-20 -right-20 w-48 h-48 rounded-full blur-3xl bg-indigo-500/10" />
+            
+            <div className="flex items-center gap-3 mb-6">
+              <div className="p-2.5 rounded-xl bg-amber-500/10 border border-amber-500/25 text-amber-400">
+                <CreditCard className="w-6 h-6" />
+              </div>
+              <div>
+                <h3 className="text-lg font-bold font-heading text-slate-200">Unregistered NFC Card Scanned</h3>
+                <p className="text-xs text-slate-500 mt-0.5">UID detected: <span className="font-mono text-indigo-400 font-bold">{quickRegisterUid}</span></p>
+              </div>
+            </div>
+
+            <form onSubmit={handleQuickRegisterSubmit} className="space-y-4">
+              <div className="space-y-1.5">
+                <label className="text-[10px] font-bold text-slate-400 uppercase">Student Full Name</label>
+                <input
+                  type="text"
+                  required
+                  value={quickRegisterName}
+                  onChange={(e) => setQuickRegisterName(e.target.value)}
+                  placeholder="Enter full name"
+                  className="w-full bg-slate-950 border border-slate-900 rounded-xl px-3.5 py-3 text-xs text-slate-200 focus:outline-none focus:border-indigo-500 transition placeholder-slate-850"
+                />
+              </div>
+
+              <div className="space-y-1.5">
+                <label className="text-[10px] font-bold text-slate-400 uppercase">Class / Grade / Section</label>
+                <input
+                  type="text"
+                  required
+                  value={quickRegisterClass}
+                  onChange={(e) => setQuickRegisterClass(e.target.value)}
+                  placeholder="e.g. Grade 5-B"
+                  className="w-full bg-slate-950 border border-slate-900 rounded-xl px-3.5 py-3 text-xs text-slate-200 focus:outline-none focus:border-indigo-500 transition placeholder-slate-850"
+                />
+              </div>
+
+              <div className="space-y-1.5">
+                <label className="text-[10px] font-bold text-slate-400 uppercase">Link Parent Profile</label>
+                <select
+                  value={quickRegisterParentId}
+                  onChange={(e) => setQuickRegisterParentId(e.target.value)}
+                  className="w-full bg-slate-950 border border-slate-900 rounded-xl px-3.5 py-3 text-xs text-slate-205 focus:outline-none focus:border-indigo-500 transition cursor-pointer"
+                  required
+                >
+                  <option value="">-- Choose Parent --</option>
+                  {parents.map((p: any) => (
+                    <option key={p.id} value={p.id}>
+                      {p.name} ({p.email})
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              {quickRegisterError && (
+                <div className="p-3 rounded-xl bg-rose-500/10 border border-rose-500/25 text-rose-300 text-xs font-semibold font-medium">
+                  {quickRegisterError}
+                </div>
+              )}
+
+              <div className="flex gap-3 mt-6">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setShowQuickRegister(false);
+                    setQuickRegisterUid('');
+                  }}
+                  className="flex-1 py-3 bg-slate-900 hover:bg-slate-850 border border-slate-850 text-slate-400 font-bold rounded-xl text-xs transition cursor-pointer"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={quickRegisterLoading}
+                  className="flex-1 py-3 bg-indigo-600 hover:bg-indigo-500 text-white font-bold rounded-xl text-xs transition cursor-pointer flex justify-center items-center gap-1.5 shadow-md shadow-indigo-600/10"
+                >
+                  {quickRegisterLoading ? (
+                    <>
+                      <RefreshCw className="w-3.5 h-3.5 animate-spin" />
+                      Registering...
+                    </>
+                  ) : (
+                    'Register & Link Card'
+                  )}
+                </button>
+              </div>
+            </form>
           </div>
         </div>
       )}
