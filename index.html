@@ -1,120 +1,765 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="dark">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CampusOne Canteen Portal</title>
+    <title>CampusOne Parent Portal</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;700;800&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
     <style>
-        body { font-family: 'Segoe UI', Arial, sans-serif; padding: 20px; background: #f4f7f6; text-align: center; }
-        .container { max-width: 400px; margin: 0 auto; background: white; padding: 30px; border-radius: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
-        .btn { background: #28a745; color: white; padding: 15px 25px; border: none; border-radius: 8px; font-size: 16px; cursor: pointer; width: 100%; font-weight: bold; }
-        .status { margin-top: 20px; font-size: 15px; color: #555; padding: 10px; border-radius: 6px; background: #e9ecef; }
+        /* CSS Root Variable Theme System */
+        :root {
+            --bg-color: #020617;
+            --grid-color: rgba(51, 65, 85, 0.1);
+            --card-bg: rgba(15, 23, 42, 0.65);
+            --border-color: rgba(51, 65, 85, 0.45);
+            --text-primary: #f8fafc;
+            --text-secondary: #94a3b8;
+            --accent-color: #10b981; /* Emerald green */
+            --accent-gradient: linear-gradient(135deg, #10b981 0%, #06b6d4 100%);
+            --accent-glow: rgba(16, 185, 129, 0.25);
+            --input-bg: #090d1f;
+            --shadow-color: rgba(0, 0, 0, 0.7);
+            --panel-blur: blur(16px);
+        }
+
+        [data-theme="light"] {
+            --bg-color: #f8fafc;
+            --grid-color: rgba(148, 163, 184, 0.1);
+            --card-bg: rgba(255, 255, 255, 0.85);
+            --border-color: rgba(203, 213, 225, 0.75);
+            --text-primary: #0f172a;
+            --text-secondary: #64748b;
+            --accent-color: #059669;
+            --accent-gradient: linear-gradient(135deg, #059669 0%, #0891b2 100%);
+            --accent-glow: rgba(5, 150, 105, 0.15);
+            --input-bg: #ffffff;
+            --shadow-color: rgba(148, 163, 184, 0.2);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+        }
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: var(--bg-color);
+            background-image: 
+                radial-gradient(var(--grid-color) 1px, transparent 1px),
+                radial-gradient(var(--grid-color) 1px, transparent 1px);
+            background-size: 24px 24px;
+            background-position: 0 0, 12px 12px;
+            color: var(--text-primary);
+            min-h: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow-x: hidden;
+        }
+
+        /* Container Layout */
+        .app-container {
+            width: 100%;
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 24px;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        /* Top Header Navigation */
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px 24px;
+            background: var(--card-bg);
+            backdrop-filter: var(--panel-blur);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 30px var(--shadow-color);
+        }
+
+        .logo-section {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .logo-section svg {
+            color: var(--accent-color);
+            width: 32px;
+            height: 32px;
+        }
+
+        .logo-text {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 1.25rem;
+            font-weight: 700;
+            background: var(--accent-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .header-controls {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        /* Toggle Button styling */
+        .theme-toggle-btn {
+            background: none;
+            border: 1px solid var(--border-color);
+            width: 42px;
+            height: 42px;
+            border-radius: 12px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-primary);
+            transition: all 0.2s ease;
+        }
+
+        .theme-toggle-btn:hover {
+            border-color: var(--accent-color);
+            box-shadow: 0 0 10px var(--accent-glow);
+        }
+
+        .logout-btn {
+            background: rgba(239, 68, 68, 0.1);
+            color: #ef4444;
+            border: 1px solid rgba(239, 68, 68, 0.2);
+            padding: 8px 16px;
+            border-radius: 12px;
+            font-size: 0.875rem;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.2s ease;
+        }
+
+        .logout-btn:hover {
+            background: rgba(239, 68, 68, 0.2);
+        }
+
+        /* Glass Cards */
+        .glass-card {
+            background: var(--card-bg);
+            backdrop-filter: var(--panel-blur);
+            border: 1px solid var(--border-color);
+            border-radius: 24px;
+            padding: 32px;
+            box-shadow: 0 10px 40px var(--shadow-color);
+            width: 100%;
+        }
+
+        /* Auth Screen layout */
+        .auth-container {
+            max-width: 420px;
+            margin: 0 auto;
+        }
+
+        .auth-header {
+            text-align: center;
+            margin-bottom: 28px;
+        }
+
+        .auth-header h1 {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 1.85rem;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+
+        .auth-header p {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+        }
+
+        /* Forms Elements */
+        .form-group {
+            margin-bottom: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        label {
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--text-secondary);
+        }
+
+        input {
+            width: 100%;
+            background: var(--input-bg);
+            border: 1px solid var(--border-color);
+            padding: 12px 16px;
+            border-radius: 12px;
+            font-size: 0.95rem;
+            color: var(--text-primary);
+            outline: none;
+            transition: border-color 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        input:focus {
+            border-color: var(--accent-color);
+            box-shadow: 0 0 0 3px var(--accent-glow);
+        }
+
+        .submit-btn {
+            width: 100%;
+            background: var(--accent-gradient);
+            border: none;
+            color: #ffffff;
+            font-weight: 700;
+            padding: 14px;
+            border-radius: 12px;
+            cursor: pointer;
+            font-size: 0.95rem;
+            box-shadow: 0 4px 15px var(--accent-glow);
+            transition: opacity 0.2s ease, transform 0.1s ease;
+        }
+
+        .submit-btn:hover {
+            opacity: 0.95;
+        }
+
+        .submit-btn:active {
+            transform: scale(0.99);
+        }
+
+        /* Dashboard View layout */
+        .dashboard-grid {
+            display: grid;
+            grid-template-cols: 1fr;
+            gap: 24px;
+        }
+
+        @media (min-width: 768px) {
+            .dashboard-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+
+        .welcome-hero {
+            grid-column: 1 / -1;
+            margin-bottom: 8px;
+        }
+
+        .welcome-hero h2 {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 1.75rem;
+            font-weight: 700;
+            margin-bottom: 6px;
+        }
+
+        .welcome-hero p {
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+        }
+
+        /* Status Badge for active state */
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 12px;
+            border-radius: 8px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            background: var(--input-bg);
+            border: 1px solid var(--border-color);
+            margin-bottom: 20px;
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background-color: var(--accent-color);
+            box-shadow: 0 0 8px var(--accent-color);
+        }
+
+        /* Keypad UI for secure PIN setup */
+        .pin-display-container {
+            display: flex;
+            justify-content: center;
+            gap: 16px;
+            margin: 24px 0;
+        }
+
+        .pin-dot {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            border: 2px solid var(--border-color);
+            transition: all 0.15s ease;
+        }
+
+        .pin-dot.filled {
+            background-color: var(--accent-color);
+            border-color: var(--accent-color);
+            box-shadow: 0 0 10px var(--accent-glow);
+            transform: scale(1.1);
+        }
+
+        .keypad-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+            max-width: 280px;
+            margin: 0 auto;
+        }
+
+        .key-btn {
+            background: var(--input-bg);
+            border: 1px solid var(--border-color);
+            color: var(--text-primary);
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 1.25rem;
+            font-weight: 600;
+            padding: 16px;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.1s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            user-select: none;
+        }
+
+        .key-btn:hover {
+            border-color: var(--accent-color);
+            background: var(--card-bg);
+        }
+
+        .key-btn:active {
+            transform: scale(0.95);
+        }
+
+        /* Alert notifications */
+        .notification-toast {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            z-index: 100;
+            padding: 16px 24px;
+            border-radius: 16px;
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            box-shadow: 0 10px 30px var(--shadow-color);
+            backdrop-filter: var(--panel-blur);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            transform: translateY(150px);
+            opacity: 0;
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .notification-toast.show {
+            transform: translateY(0);
+            opacity: 1;
+        }
+
+        .notification-toast.success {
+            border-left: 4px solid var(--accent-color);
+        }
+
+        .notification-toast.error {
+            border-left: 4px solid #ef4444;
+        }
+
+        .notification-toast svg {
+            width: 20px;
+            height: 20px;
+        }
+
+        /* View Switching animations */
+        .view-section {
+            display: none;
+        }
+
+        .view-section.active {
+            display: block;
+            animation: fadeIn 0.3s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Footer styling */
+        footer {
+            text-align: center;
+            padding: 24px 0;
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            margin-top: auto;
+        }
     </style>
 </head>
 <body>
 
-<div class="container">
-    <h2>CampusOne Pay Terminal</h2>
-    <p>Select item and tap the student ID card to process payment.</p>
-    
-    <div style="margin-bottom: 20px;">
-        <label for="amount" style="display:block; text-align:left; margin-bottom:5px; font-weight:bold;">Amount (₹):</label>
-        <input type="number" id="amount" value="40" style="width:90%; padding:10px; font-size:16px; border-radius:6px; border:1px solid #ccc;">
+<div class="app-container">
+    <!-- Navigation Header -->
+    <header>
+        <div class="logo-section">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+                <path d="M12 2v9"/>
+                <path d="M8 5h8"/>
+            </svg>
+            <span class="logo-text">CampusOne Portal</span>
+        </div>
+        <div class="header-controls">
+            <!-- Light/Dark Mode Switch -->
+            <button class="theme-toggle-btn" id="themeToggle" onclick="toggleTheme()" title="Toggle Theme">
+                <svg id="themeIconSun" style="display:none;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+                <svg id="themeIconMoon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+            </button>
+            <!-- Log Out Button -->
+            <button class="logout-btn" id="logoutBtn" style="display:none;" onclick="logout()" title="Log Out">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+                Sign Out
+            </button>
+        </div>
+    </header>
+
+    <!-- 1. AUTHORIZATION SCREEN -->
+    <div class="view-section active" id="authView">
+        <div class="glass-card auth-container">
+            <div class="auth-header">
+                <h1>Parent Dashboard</h1>
+                <p>Register or sign in to configure your student's canteen limits and secure security PIN.</p>
+            </div>
+            <form id="authForm" onsubmit="handleAuth(event)">
+                <div class="form-group">
+                    <label for="authEmail">Parent Email</label>
+                    <input type="email" id="authEmail" required placeholder="parent@example.com">
+                </div>
+                <div class="form-group">
+                    <label for="authPassword">Password</label>
+                    <input type="password" id="authPassword" required placeholder="••••••••">
+                </div>
+                <button type="submit" class="submit-btn" style="margin-top: 10px;">Sign In / Auto-Register</button>
+            </form>
+        </div>
     </div>
 
-    <button class="btn" onclick="startNfcScan()">Activate NFC Scanner</button>
-    <div class="status" id="statusBox">Status: Ready to scan.</div>
+    <!-- 2. PARENT CONTROLS DASHBOARD SCREEN -->
+    <div class="view-section" id="dashboardView">
+        <div class="dashboard-grid">
+            <!-- Hero Header banner -->
+            <div class="welcome-hero">
+                <h2>Canteen Wallet Dashboard</h2>
+                <p>Welcome, <span id="parentEmailDisplay" style="font-weight: 600; color: var(--accent-color);">parent@example.com</span>. Manage your child's profile details below.</p>
+            </div>
+
+            <!-- Card A: Student Profile Setup -->
+            <div class="glass-card">
+                <div class="status-badge">
+                    <span class="status-dot"></span>
+                    <span>Student Profile Setup</span>
+                </div>
+                <form id="profileForm" onsubmit="saveProfile(event)">
+                    <div class="form-group">
+                        <label for="studentNameInput">Student's Full Name</label>
+                        <input type="text" id="studentNameInput" required placeholder="e.g. Alex Mercer">
+                    </div>
+                    <button type="submit" class="submit-btn" style="margin-top: 12px;">Save Profile Details</button>
+                </form>
+                <div id="profileSavedIndicator" style="margin-top: 20px; font-size: 0.85rem; color: var(--text-secondary); display: none;">
+                    ✅ Active Child: <strong id="activeStudentLabel" style="color: var(--text-primary);">None</strong>
+                </div>
+            </div>
+
+            <!-- Card B: Campus PIN Security Manager -->
+            <div class="glass-card">
+                <div class="status-badge" style="border-color: rgba(99, 102, 241, 0.45);">
+                    <span class="status-dot" style="background-color: #6366f1; box-shadow: 0 0 8px #6366f1;"></span>
+                    <span>Security PIN Manager</span>
+                </div>
+                <p style="font-size: 0.8rem; color: var(--text-secondary); margin-bottom: 15px; line-height: 1.5;">
+                    Configure a secure 4-digit Campus Security PIN. Your child will use this to authorize cashier deductions at the canteen checkout.
+                </p>
+
+                <!-- PIN Keypad Display -->
+                <div class="pin-display-container">
+                    <div class="pin-dot" id="dot0"></div>
+                    <div class="pin-dot" id="dot1"></div>
+                    <div class="pin-dot" id="dot2"></div>
+                    <div class="pin-dot" id="dot3"></div>
+                </div>
+
+                <!-- Virtual Keypad Grid -->
+                <div class="keypad-grid">
+                    <button type="button" class="key-btn" onclick="pressKey('1')">1</button>
+                    <button type="button" class="key-btn" onclick="pressKey('2')">2</button>
+                    <button type="button" class="key-btn" onclick="pressKey('3')">3</button>
+                    <button type="button" class="key-btn" onclick="pressKey('4')">4</button>
+                    <button type="button" class="key-btn" onclick="pressKey('5')">5</button>
+                    <button type="button" class="key-btn" onclick="pressKey('6')">6</button>
+                    <button type="button" class="key-btn" onclick="pressKey('7')">7</button>
+                    <button type="button" class="key-btn" onclick="pressKey('8')">8</button>
+                    <button type="button" class="key-btn" onclick="pressKey('9')">9</button>
+                    <button type="button" class="key-btn" onclick="pressKey('clear')" style="font-size: 0.875rem; color: #ef4444;">Clear</button>
+                    <button type="button" class="key-btn" onclick="pressKey('0')">0</button>
+                    <button type="button" class="key-btn" onclick="savePin()" style="font-size: 0.875rem; color: var(--accent-color); font-weight: 700;">Save</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer>
+        <p>&copy; 2026 CampusOne Cashless System. SSL Protected & Encrypted.</p>
+    </footer>
+</div>
+
+<!-- Notification Toast System -->
+<div class="notification-toast" id="toast">
+    <!-- Icon Placeholder -->
+    <span id="toastIcon"></span>
+    <span id="toastMessage" style="font-size: 0.875rem; font-weight: 600;">Message here</span>
 </div>
 
 <script>
-    // Automatically start listening the millisecond the page loads on the phone
+    // State Manager
+    const state = {
+        parentId: null,
+        email: '',
+        student: null,
+        currentPinInput: ''
+    };
+
+    // Auto check if parent is logged in
     window.addEventListener('load', () => {
-        autoInitializeNfcReader();
+        const savedParent = localStorage.getItem('parentUser');
+        if (savedParent) {
+            const data = JSON.parse(savedParent);
+            loginSuccess(data);
+        }
     });
 
-    let ndef = null; // Holds our active hardware scanner instance
+    // Theme Switch Engine
+    function toggleTheme() {
+        const html = document.documentElement;
+        const currentTheme = html.getAttribute('data-theme');
+        const nextTheme = currentTheme === 'dark' ? 'light' : 'dark';
+        html.setAttribute('data-theme', nextTheme);
+        
+        const sun = document.getElementById('themeIconSun');
+        const moon = document.getElementById('themeIconMoon');
+        if (nextTheme === 'light') {
+            sun.style.display = 'block';
+            moon.style.display = 'none';
+        } else {
+            sun.style.display = 'none';
+            moon.style.display = 'block';
+        }
+    }
 
-    async function autoInitializeNfcReader() {
-        const statusBox = document.getElementById('statusBox');
+    // Auth Submission
+    async function handleAuth(event) {
+        event.preventDefault();
+        const email = document.getElementById('authEmail').value;
+        const password = document.getElementById('authPassword').value;
 
-        // 1. Verify browser compatibility
-        if (!('NDEFReader' in window)) {
-            statusBox.style.background = '#f8d7da';
-            statusBox.innerHTML = "<strong style='color:#721c24;'>Web NFC Not Supported!</strong><br>Use Chrome on Android over HTTPS.";
+        try {
+            const res = await fetch('/api/parent/login', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email, password })
+            });
+
+            const data = await res.json();
+            if (data.success) {
+                localStorage.setItem('parentUser', JSON.stringify(data));
+                loginSuccess(data);
+                showToast('Authentication successful!', 'success');
+            } else {
+                showToast(data.error || 'Login failed', 'error');
+            }
+        } catch (err) {
+            showToast('Unable to connect to login server.', 'error');
+        }
+    }
+
+    function loginSuccess(data) {
+        state.parentId = data.parentId;
+        state.email = data.email;
+        state.student = data.student;
+
+        // Update UI displays
+        document.getElementById('parentEmailDisplay').innerText = data.email;
+        document.getElementById('logoutBtn').style.display = 'flex';
+        
+        if (data.student) {
+            document.getElementById('studentNameInput').value = data.student.name;
+            updateProfileIndicator(data.student.name);
+            highlightPinDots(data.student.campus_pin.length);
+            state.currentPinInput = data.student.campus_pin;
+        }
+
+        switchView('dashboardView');
+    }
+
+    function logout() {
+        localStorage.removeItem('parentUser');
+        state.parentId = null;
+        state.email = '';
+        state.student = null;
+        state.currentPinInput = '';
+        
+        document.getElementById('authForm').reset();
+        document.getElementById('logoutBtn').style.display = 'none';
+        document.getElementById('profileSavedIndicator').style.display = 'none';
+        highlightPinDots(0);
+        
+        switchView('authView');
+        showToast('Signed out successfully.', 'success');
+    }
+
+    function switchView(viewId) {
+        document.querySelectorAll('.view-section').forEach(view => {
+            view.classList.remove('active');
+        });
+        document.getElementById(viewId).classList.add('active');
+    }
+
+    // Save Student Profile Name
+    async function saveProfile(event) {
+        event.preventDefault();
+        const studentName = document.getElementById('studentNameInput').value;
+
+        try {
+            const res = await fetch('/api/parent/setup-profile', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ parentId: state.parentId, studentName })
+            });
+
+            const data = await res.json();
+            if (data.success) {
+                state.student = data.student;
+                // Update local storage representation
+                const stored = JSON.parse(localStorage.getItem('parentUser'));
+                stored.student = data.student;
+                localStorage.setItem('parentUser', JSON.stringify(stored));
+
+                updateProfileIndicator(data.student.name);
+                showToast('Student profile saved successfully.', 'success');
+            } else {
+                showToast(data.error || 'Failed to save profile', 'error');
+            }
+        } catch (err) {
+            showToast('Sync error saving profile.', 'error');
+        }
+    }
+
+    function updateProfileIndicator(name) {
+        const indicator = document.getElementById('profileSavedIndicator');
+        const label = document.getElementById('activeStudentLabel');
+        label.innerText = name;
+        indicator.style.display = 'block';
+    }
+
+    // Virtual Numeric Keypad logic
+    function pressKey(key) {
+        if (key === 'clear') {
+            state.currentPinInput = '';
+            highlightPinDots(0);
+            return;
+        }
+
+        if (state.currentPinInput.length < 4) {
+            state.currentPinInput += key;
+            highlightPinDots(state.currentPinInput.length);
+        }
+    }
+
+    function highlightPinDots(count) {
+        for (let i = 0; i < 4; i++) {
+            const dot = document.getElementById(`dot${i}`);
+            if (i < count) {
+                dot.classList.add('filled');
+            } else {
+                dot.classList.remove('filled');
+            }
+        }
+    }
+
+    // Save 4-Digit Security PIN
+    async function savePin() {
+        if (state.currentPinInput.length !== 4) {
+            showToast('Please enter a complete 4-digit PIN.', 'error');
+            return;
+        }
+
+        if (!state.student) {
+            showToast('Please save the student name profile first!', 'error');
             return;
         }
 
         try {
-            // 2. Instantiate and start scanning automatically
-            ndef = new NDEFReader();
-            await ndef.scan();
-            
-            statusBox.style.background = '#d4edda';
-            statusBox.innerHTML = "<span style='color:#155724;'>⚡ System Live & Automated. Tap a Student ID card anytime!</span>";
-
-            // 3. Keep listening for continuous taps
-            ndef.addEventListener("reading", async ({ serialNumber }) => {
-                const amount = document.getElementById('amount').value;
-                statusBox.style.background = '#cce5ff';
-                statusBox.innerHTML = `Card detected: <b>${serialNumber}</b>. Processing transaction...`;
-
-                // 4. Send the auto-captured hardware UID token to the cloud database
-                await executePaymentRequest(serialNumber, parseFloat(amount));
-            });
-
-            // Handle temporary hardware dropouts or read errors gracefully
-            ndef.addEventListener("readingerror", () => {
-                statusBox.style.background = '#fff3cd';
-                statusBox.innerHTML = "<b style='color:#856404;'>Read Error:</b> Bad tap. Please hold the card steady against the phone.";
-            });
-
-        } catch (error) {
-            statusBox.style.background = '#fff3cd';
-            statusBox.innerHTML = `⚠️ Click anywhere on the screen to grant NFC permissions to the browser.`;
-            
-            // Browser security fallback: User must touch the screen once if autofocus permissions are restricted
-            window.addEventListener('click', async () => {
-                if(ndef === null) autoInitializeNfcReader();
-            }, { once: true });
-        }
-    }
-
-    // Alias for button click backwards compatibility
-    function startNfcScan() {
-        if(ndef === null) {
-            autoInitializeNfcReader();
-        }
-    }
-
-    // Separate function to manage the background API pipeline
-    async function executePaymentRequest(cardUid, activeAmount) {
-        const statusBox = document.getElementById('statusBox');
-        try {
-            const response = await fetch('/api/pay', {
+            const res = await fetch('/api/parent/setup-pin', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ cardUid: cardUid, amount: activeAmount })
+                body: JSON.stringify({ parentId: state.parentId, pin: state.currentPinInput })
             });
-            
-            const result = await response.json();
-            
-            if (result.success) {
-                statusBox.style.background = '#d4edda';
-                statusBox.innerHTML = `✅ <b>Approved!</b> ${result.studentName}<br>Remaining: ₹${result.newBalance}`;
-                
-                // Auto-reset back to clean listening mode after 2.5 seconds for the next student
-                setTimeout(() => {
-                    statusBox.style.background = '#d4edda';
-                    statusBox.innerHTML = "<span style='color:#155724;'>⚡ System Live & Automated. Ready for next card...</span>";
-                }, 2500);
-                
+
+            const data = await res.json();
+            if (data.success) {
+                state.student = data.student;
+                // Update local storage representation
+                const stored = JSON.parse(localStorage.getItem('parentUser'));
+                stored.student = data.student;
+                localStorage.setItem('parentUser', JSON.stringify(stored));
+
+                showToast('Campus security PIN updated successfully!', 'success');
             } else {
-                statusBox.style.background = '#f8d7da';
-                statusBox.innerHTML = `<strong style='color:#721c24;'>Declined:</strong> ${result.error}`;
+                showToast(data.error || 'Failed to update PIN', 'error');
             }
         } catch (err) {
-            statusBox.innerHTML = "Backend sync failed. Check internet connectivity.";
+            showToast('Connection error updating security PIN.', 'error');
         }
+    }
+
+    // Toast Alert system
+    function showToast(msg, type) {
+        const toast = document.getElementById('toast');
+        const icon = document.getElementById('toastIcon');
+        const message = document.getElementById('toastMessage');
+
+        toast.className = `notification-toast show ${type}`;
+        message.innerText = msg;
+
+        if (type === 'success') {
+            icon.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>';
+        } else {
+            icon.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="#ef4444" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>';
+        }
+
+        // Clear toast after 3.5 seconds
+        setTimeout(() => {
+            toast.classList.remove('show');
+        }, 3500);
     }
 </script>
 </body>

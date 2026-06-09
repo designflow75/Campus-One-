@@ -201,6 +201,21 @@ export class StudentService {
     });
   }
 
+  async findByNfcUid(nfcUid: string) {
+    const student = await this.prisma.student.findUnique({
+      where: { nfcUid },
+      include: {
+        wallet: true,
+        restrictions: true,
+        allergies: true,
+      },
+    });
+    if (!student) {
+      throw new NotFoundException('Student card not registered');
+    }
+    return student;
+  }
+
   async findParents() {
     return this.prisma.user.findMany({
       where: { role: 'PARENT' },

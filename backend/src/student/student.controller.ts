@@ -30,6 +30,12 @@ export class StudentController {
     return this.studentService.findByParent(req.user.userId);
   }
 
+  @Get('nfc/:nfcUid')
+  @Roles('ADMIN', 'STAFF')
+  async findByNfcUid(@Param('nfcUid') nfcUid: string) {
+    return this.studentService.findByNfcUid(nfcUid);
+  }
+
   @Get('parents')
   @Roles('ADMIN', 'STAFF')
   async findParents() {

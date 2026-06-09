@@ -17,7 +17,8 @@ export default function StaffDashboard() {
   const [stats, setStats] = useState<any>(null);
   
   // Scanning / Verification Simulation states
-  const [nfcUid, setNfcUid] = useState('123456789'); // Preset with Alex's UID for convenience
+  const [nfcUid, setNfcUid] = useState('');
+  const [nameSearchQuery, setNameSearchQuery] = useState('');
   const [processingTransaction, setProcessingTransaction] = useState(false);
   const [showResultOverlay, setShowResultOverlay] = useState(false);
   const [transactionResult, setTransactionResult] = useState<any>(null);
@@ -214,13 +215,13 @@ export default function StaffDashboard() {
     const cleanUid = uid.replace(/:/g, '').toUpperCase();
     console.log("Processing captured NFC UID:", cleanUid);
 
-    const matched = students.find((s: any) => s.nfcUid === cleanUid);
-
-    if (matched) {
+    try {
+      setNfcErrorText('');
+      const matched = await apiRequest(`/students/nfc/${cleanUid}`);
+      
       setNfcUid(cleanUid);
       setScannedStudentName(matched.name);
       setScannedStudentClass(matched.class);
-      setNfcErrorText('');
 
       if (activeTab === 'CHECKOUT') {
         setCart((currentCart) => {
@@ -231,7 +232,10 @@ export default function StaffDashboard() {
           return currentCart;
         });
       }
-    } else {
+    } catch (err: any) {
+      console.warn("NFC UID lookup failed, opening Quick Registration:", err.message);
+      setScannedStudentName('');
+      setScannedStudentClass('');
       setQuickRegisterUid(cleanUid);
       setQuickRegisterName('');
       setQuickRegisterClass('');
@@ -944,7 +948,7 @@ export default function StaffDashboard() {
                     <div>
                       <span className="text-[9px] font-extrabold text-indigo-400 uppercase tracking-widest block">IDENTIFIED STUDENT</span>
                       <p className="text-xs font-bold text-slate-200 mt-0.5">{scannedStudentName}</p>
-                      <p className="text-[9px] text-slate-400 font-semibold mt-0.5">Grade: {scannedStudentClass} • UID: {nfcUid}</p>
+                      <p className="text-[9px] text-slate-400 font-semibold mt-0.5">Grade: {scannedStudentClass}</p>
                     </div>
                   </div>
                   <button 
@@ -953,6 +957,7 @@ export default function StaffDashboard() {
                       setScannedStudentName('');
                       setScannedStudentClass('');
                       setNfcUid('');
+                      setNameSearchQuery('');
                     }}
                     className="z-10 text-[9px] font-bold text-slate-500 hover:text-rose-450 bg-slate-950 px-2 py-1 rounded-lg border border-slate-905 hover:border-rose-500/20 transition cursor-pointer"
                   >
@@ -1055,42 +1060,43 @@ export default function StaffDashboard() {
               {/* Simulation Controls Grid - preventing overlaps */}
               {Object.keys(cart).length > 0 && (
                 <div className="mt-4 pt-4 border-t border-slate-900/60 space-y-3">
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                    <div className="space-y-1">
-                      <label className="text-[9px] font-extrabold text-slate-500 uppercase tracking-wider block">
-                        Simulation Mode
-                      </label>
-                      <select
-                        value={nfcUid}
-                        onChange={(e) => setNfcUid(e.target.value)}
-                        className="w-full bg-slate-950 border border-slate-900 rounded-lg px-2.5 py-2 text-[10px] font-semibold text-slate-300 focus:outline-none focus:border-indigo-500 transition cursor-pointer"
-                      >
-                        <option value="">-- Choose Card --</option>
-                        {students.filter((s: any) => s.nfcUid).map((s: any) => (
-                          <option key={s.id} value={s.nfcUid}>
-                            {s.name} ({s.class})
-                          </option>
-                        ))}
-                        <option value="123456789">Mock Alex (123456789)</option>
-                        <option value="999999999">Mock New Card (999999999)</option>
-                      </select>
-                    </div>
-
-                    <div className="space-y-1">
-                      <label className="text-[9px] font-extrabold text-slate-500 uppercase tracking-wider block">
-                        Manual Override
-                      </label>
-                      <div className="relative">
-                        <CreditCard className="absolute left-2.5 top-2.5 w-3.5 h-3.5 text-slate-600" />
-                        <input
-                          type="text"
-                          required
-                          value={nfcUid}
-                          onChange={(e) => setNfcUid(e.target.value)}
-                          placeholder="Type UID"
-                          className="w-full pl-8 pr-2.5 py-1.5 bg-slate-950 border border-slate-900 rounded-lg focus:border-indigo-500 focus:outline-none text-[10px] font-semibold text-slate-300 placeholder-slate-800"
-                        />
-                      </div>
+                  <div className="space-y-1">
+                    <label className="text-[9px] font-extrabold text-slate-500 uppercase tracking-wider block">
+                      Search Student by Name
+                    </label>
+                    <div className="relative">
+                      <input
+                        type="text"
+                        required
+                        value={nameSearchQuery}
+                        onChange={(e) => {
+                          const query = e.target.value;
+                          setNameSearchQuery(query);
+                          
+                          if (query.trim().length >= 1) {
+                            // Find student in local array whose name starts with this text (first initial/letters)
+                            const matched = students.find((s: any) =>
+                              s.name.toLowerCase().startsWith(query.trim().toLowerCase())
+                            );
+                            
+                            if (matched) {
+                              setNfcUid(matched.nfcUid || '');
+                              setScannedStudentName(matched.name);
+                              setScannedStudentClass(matched.class);
+                            } else {
+                              setNfcUid('');
+                              setScannedStudentName('');
+                              setScannedStudentClass('');
+                            }
+                          } else {
+                            setNfcUid('');
+                            setScannedStudentName('');
+                            setScannedStudentClass('');
+                          }
+                        }}
+                        placeholder="Type name or first initial (e.g. Alex)"
+                        className="w-full px-3.5 py-2.5 bg-slate-950 border border-slate-900 rounded-lg focus:border-indigo-500 focus:outline-none text-[10px] font-semibold text-slate-300 placeholder-slate-800"
+                      />
                     </div>
                   </div>
 
